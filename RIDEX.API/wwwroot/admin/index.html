@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIDEX Admin — Motorcycle Touring Platform</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <img src="images/logo.png" alt="RIDEX" class="admin-sidebar-logo">
+                <div class="logo-text">
+                    <span class="brand-title">RIDEX</span>
+                    <span class="brand-badge">ADMIN</span>
+                </div>
+            </div>
+            <div class="tagline">Ride together. Ride smarter.</div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="dashboard">
+                    <span class="icon">📊</span> Dashboard
+                </button>
+                <button class="nav-item" data-tab="rides">
+                    <span class="icon">🗺️</span> Active Rides
+                </button>
+                <button class="nav-item" data-tab="riders">
+                    <span class="icon">👥</span> Riders
+                </button>
+                <button class="nav-item" data-tab="simulator">
+                    <span class="icon">🎮</span> GPS Simulator
+                </button>
+                <button class="nav-item" data-tab="system">
+                    <span class="icon">⚡</span> System Health
+                </button>
+            </nav>
+
+            <div class="cost-badge">
+                <div class="cost-pill">₹0 / $0 OPERATING COST</div>
+                <div class="cost-sub">Zero-Cost Free Infrastructure</div>
+            </div>
+
+            <div class="admin-profile">
+                <div class="avatar">AD</div>
+                <div class="admin-info">
+                    <div class="name">Administrator</div>
+                    <div class="email">admin@ridex.local</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header Bar -->
+            <header class="topbar">
+                <div class="topbar-title">
+                    <h1 id="page-heading">Operations Dashboard</h1>
+                    <p id="page-subheading">Live group ride monitoring and telemetry status</p>
+                </div>
+                <div class="topbar-actions">
+                    <div class="status-indicator">
+                        <span class="pulse-dot"></span>
+                        <span id="signalr-status">SignalR: Live Engine Active</span>
+                    </div>
+                    <button class="btn-primary" id="btn-refresh">🔄 Refresh Telemetry</button>
+                </div>
+            </header>
+
+            <!-- TAB 1: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-pane active">
+                <!-- Metric Cards Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">TOTAL RIDERS</span>
+                            <span class="metric-icon">👥</span>
+                        </div>
+                        <div class="metric-value" id="stat-total-users">12,420</div>
+                        <div class="metric-footer text-success">↑ +14% this week</div>
+                    </div>
+
+                    <div class="metric-card highlight-orange">
+                        <div class="metric-header">
+                            <span class="metric-title">ACTIVE GROUP RIDES</span>
+                            <span class="metric-icon">🏍️</span>
+                        </div>
+                        <div class="metric-value" id="stat-active-rides">82</div>
+                        <div class="metric-footer">Live tracking enabled</div>
+                    </div>
+
+                    <div class="metric-card highlight-cyan">
+                        <div class="metric-header">
+                            <span class="metric-title">ONLINE RIDERS NOW</span>
+                            <span class="metric-icon">📡</span>
+                        </div>
+                        <div class="metric-value" id="stat-online-riders">316</div>
+                        <div class="metric-footer">Adaptive GPS telemetry</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">TOTAL DISTANCE</span>
+                            <span class="metric-icon">🛣️</span>
+                        </div>
+                        <div class="metric-value" id="stat-total-distance">148,290 km</div>
+                        <div class="metric-footer">Across touring routes</div>
+                    </div>
+                </div>
+
+                <!-- Live Map & Active Group Monitor Split -->
+                <div class="grid-split">
+                    <div class="panel-card map-panel">
+                        <div class="panel-header">
+                            <h2>Live Fleet & Route Map</h2>
+                            <span class="badge-live">LIVE OSM STREAM</span>
+                        </div>
+                        <div id="admin-map" class="map-container"></div>
+                    </div>
+
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <h2>Featured Expedition</h2>
+                            <span class="badge-code">RX-8F29K</span>
+                        </div>
+                        <div class="expedition-info">
+                            <div class="exp-title">Monsoon Western Ghats Expedition</div>
+                            <div class="exp-route">Nashik → Bhandardara → Malshej → Pune</div>
+                            <div class="exp-stats">
+                                <div><span class="label">Distance:</span> <strong>342 km</strong></div>
+                                <div><span class="label">Duration:</span> <strong>7h 20m</strong></div>
+                                <div><span class="label">Riders:</span> <strong>4 Joined</strong></div>
+                                <div><span class="label">Status:</span> <strong class="text-success">In Progress</strong></div>
+                            </div>
+                        </div>
+
+                        <div class="rider-list-mini">
+                            <div class="rider-item">
+                                <div class="rider-avatar">AD</div>
+                                <div class="rider-details">
+                                    <strong>Aryan Deshmukh (Leader)</strong>
+                                    <span>Himalayan 450 • 58 km/h • 0.0 km</span>
+                                </div>
+                                <span class="badge-online">ONLINE</span>
+                            </div>
+                            <div class="rider-item">
+                                <div class="rider-avatar">VP</div>
+                                <div class="rider-details">
+                                    <strong>Vikram Patil (Co-Leader)</strong>
+                                    <span>KTM 390 Adv • 56 km/h • 0.3 km behind</span>
+                                </div>
+                                <span class="badge-online">ONLINE</span>
+                            </div>
+                            <div class="rider-item">
+                                <div class="rider-avatar">NS</div>
+                                <div class="rider-details">
+                                    <strong>Neha Sharma (Member)</strong>
+                                    <span>BMW G310 GS • 52 km/h • 0.8 km behind</span>
+                                </div>
+                                <span class="badge-online">ONLINE</span>
+                            </div>
+                            <div class="rider-item separated">
+                                <div class="rider-avatar">RM</div>
+                                <div class="rider-details">
+                                    <strong>Rohan Mehta (Sweeper)</strong>
+                                    <span>Scrambler 400X • 42 km/h • 2.4 km behind</span>
+                                </div>
+                                <span class="badge-warn">SEPARATED</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: ACTIVE RIDES -->
+            <section id="tab-rides" class="tab-pane">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h2>All Group Rides</h2>
+                        <input type="text" placeholder="Search by title or join code..." class="search-input" id="search-rides">
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Join Code</th>
+                                <th>Ride Title</th>
+                                <th>Leader</th>
+                                <th>Distance</th>
+                                <th>Members</th>
+                                <th>Status</th>
+                                <th>Scheduled Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rides-table-body">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 3: RIDERS -->
+            <section id="tab-riders" class="tab-pane">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h2>Rider Community Directory</h2>
+                        <input type="text" placeholder="Search by name, email, or city..." class="search-input" id="search-riders">
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Rider</th>
+                                <th>Email</th>
+                                <th>City</th>
+                                <th>Role</th>
+                                <th>Rides</th>
+                                <th>Motorcycles</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody id="riders-table-body">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 4: GPS SIMULATOR -->
+            <section id="tab-simulator" class="tab-pane">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h2>Real-Time Multi-Rider GPS Simulator</h2>
+                        <span class="badge-code">DEMO TESTING MODE</span>
+                    </div>
+                    <p class="section-desc">
+                        Simulate live motorcycle movements, telemetry updates, and separation threshold alerts across the Western Ghats corridor without requiring multiple physical smartphones.
+                    </p>
+
+                    <div class="sim-controls">
+                        <button class="btn-primary" id="btn-start-sim">▶ Start Multi-Rider Simulation</button>
+                        <button class="btn-secondary" id="btn-step-sim">⏭ Single Step Forward</button>
+                        <button class="btn-danger" id="btn-stop-sim">⏹ Stop Simulation</button>
+                        <div class="sim-status" id="sim-status-text">Simulator Idle (Ready to broadcast SignalR telemetry)</div>
+                    </div>
+
+                    <div class="sim-telemetry-box" id="sim-telemetry-output">
+                        <pre id="sim-log-text">Click "Start Multi-Rider Simulation" or "Single Step Forward" to push live coordinates to SignalR.</pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: SYSTEM HEALTH -->
+            <section id="tab-system" class="tab-pane">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h2>Zero-Cost Infrastructure Health & Metrics</h2>
+                        <span class="badge-online">100% OPERATIONAL</span>
+                    </div>
+
+                    <div class="health-grid">
+                        <div class="health-item">
+                            <span class="health-label">DATABASE ENGINE</span>
+                            <strong class="health-val text-cyan">SQLite / PostgreSQL + PostGIS</strong>
+                            <span class="health-desc">Zero-cost local database with PostGIS production switch</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-label">REAL-TIME ENGINE</span>
+                            <strong class="health-val text-success">ASP.NET Core SignalR (In-Memory Live Store)</strong>
+                            <span class="health-desc">ConcurrentDictionary state store with periodic DB batching</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-label">MAP & ROUTING SERVICE</span>
+                            <strong class="health-val text-cyan">OpenStreetMap + OSRM Engine</strong>
+                            <span class="health-desc">Free routing with local SQLite geometry caching</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-label">WEATHER PROVIDER</span>
+                            <strong class="health-val text-success">Open-Meteo Free API (No Key Required)</strong>
+                            <span class="health-desc">Hourly forecasts, rain probability, wind alerts</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-label">OFFLINE SYNC ENGINE</span>
+                            <strong class="health-val text-cyan">SQLite Batch Queue + Idempotent Processor</strong>
+                            <span class="health-desc">Deduplication with exponential retry backoff</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-label">EXPENSE SETTLEMENT</span>
+                            <strong class="health-val text-success">Greedy Debt Minimization Algorithm</strong>
+                            <span class="health-desc">Minimizes bilateral cash transactions across group riders</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

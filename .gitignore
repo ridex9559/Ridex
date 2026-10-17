@@ -1,0 +1,45 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+*.apk
+*.aab
+
+# Environment & Secrets (Never commit .env files with secrets)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Expo & Mobile
+.expo/
+web-build/
+expo-env.d.ts
+
+# .NET / Visual Studio
+bin/
+obj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+TestResults/
+*.ide/
+
+# Logs & Crash Dumps
+*.log
+hs_err_pid*
+replay_pid*
+
+# OS Files
+.DS_Store
+Thumbs.db

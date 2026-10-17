@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net8.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>RIDEX.Mobile</RootNamespace>
+		<AssemblyName>RIDEX.Mobile</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\RIDEX.Shared\RIDEX.Shared.csproj" />
+		<ProjectReference Include="..\RIDEX.Core\RIDEX.Core.csproj" />
+		<ProjectReference Include="..\RIDEX.Infrastructure\RIDEX.Infrastructure.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.8" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.10" />
+	</ItemGroup>
+
+</Project>

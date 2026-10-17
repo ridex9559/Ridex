@@ -1,0 +1,18 @@
+{
+  "name": "RIDEX Motorcycle Touring",
+  "short_name": "RIDEX",
+  "description": "Connected group riding, live radar tracking, waypoint routing, and motorcycle touring platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080A0F",
+  "theme_color": "#FF6B00",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

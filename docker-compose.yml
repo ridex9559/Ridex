@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  ridex-db:
+    image: postgis/postgis:15-3.3-alpine
+    container_name: ridex_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ridex_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ridex_secure_password_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  ridex-api:
+    build:
+      context: .
+      dockerfile: RIDEX.API/Dockerfile
+    container_name: ridex_api
+    restart: unless-stopped
+    depends_on:
+      - ridex-db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__PostgreSQL=Host=ridex-db;Port=5432;Database=ridex_db;Username=postgres;Password=ridex_secure_password_2026
+      - Jwt__Secret=RIDEX_ULTRA_SECURE_ZERO_COST_DOCKER_SECRET_KEY_1234567890!@#$%
+      - Jwt__Issuer=RIDEX.API
+      - Jwt__Audience=RIDEX.Mobile
+    ports:
+      - "5000:80"
+    volumes:
+      - api_uploads:/app/wwwroot/uploads
+
+volumes:
+  postgres_data:
+  api_uploads:
