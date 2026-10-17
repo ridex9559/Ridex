@@ -53,7 +53,7 @@ const AppShell: React.FC = () => {
           <Route path="/rides/live/:id" element={<LiveRideCockpitPage />} />
           <Route path="/connect" element={<ConnectRidePage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/garage" replace />} />
         </Routes>
       </main>
 

@@ -11,19 +11,19 @@ export const BottomNav: React.FC = () => {
   return (
     <nav className="bottom-nav">
       <NavLink
-        to="/dashboard"
-        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-      >
-        <Compass size={22} />
-        <span>Rides</span>
-      </NavLink>
-
-      <NavLink
         to="/garage"
         className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
       >
         <Warehouse size={22} />
         <span>Garage</span>
+      </NavLink>
+
+      <NavLink
+        to="/dashboard"
+        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+      >
+        <Compass size={22} />
+        <span>Rides</span>
       </NavLink>
 
       <NavLink

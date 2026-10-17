@@ -21,10 +21,10 @@ export const RegisterPage: React.FC = () => {
   const { user, isInitialized, initialize } = useAuthStore();
   const navigate = useNavigate();
 
-  // If already authenticated, bypass directly to dashboard
+  // If already authenticated, bypass directly to garage
   useEffect(() => {
     if (isInitialized && user) {
-      navigate('/dashboard', { replace: true });
+      navigate('/garage', { replace: true });
     }
   }, [user, isInitialized, navigate]);
 
@@ -46,7 +46,7 @@ export const RegisterPage: React.FC = () => {
     try {
       await authService.signUp(email, password, fullName, username);
       await initialize();
-      navigate('/dashboard');
+      navigate('/garage');
     } catch (err: any) {
       console.error('[RegisterPage] Sign up error:', err);
       setErrorMsg(err.message || 'Failed to create account. Please check your details.');

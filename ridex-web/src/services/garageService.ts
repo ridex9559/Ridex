@@ -154,4 +154,55 @@ export const garageService = {
 
     return !error;
   },
+
+  /**
+   * Persists rider onboarding preference (e.g. 'no_bike' or 'has_bike').
+   * Uses Supabase Auth user metadata + localStorage cache with ZERO schema migration.
+   */
+  async setOnboardingChoice(userId: string, choice: 'no_bike' | 'completed'): Promise<void> {
+    const key = `ridex_onboarding_${userId}`;
+    onboardingMemoryCache.set(key, choice);
+
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        window.localStorage.setItem(key, choice);
+      } catch (_) {}
+    } else if (typeof globalThis !== 'undefined' && (globalThis as any).localStorage) {
+      try {
+        (globalThis as any).localStorage.setItem(key, choice);
+      } catch (_) {}
+    }
+
+    try {
+      await supabase.auth.updateUser({
+        data: { onboarding_choice: choice, has_bike: choice === 'completed' },
+      });
+    } catch (err) {
+      console.warn('[garageService] setOnboardingChoice warning:', err);
+    }
+  },
+
+  /**
+   * Retrieves saved onboarding choice.
+   */
+  getOnboardingChoice(userId: string, userMetadata?: any): string | null {
+    if (userMetadata?.onboarding_choice) {
+      return userMetadata.onboarding_choice;
+    }
+
+    const key = `ridex_onboarding_${userId}`;
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const val = window.localStorage.getItem(key);
+      if (val) return val;
+    } else if (typeof globalThis !== 'undefined' && (globalThis as any).localStorage) {
+      const val = (globalThis as any).localStorage.getItem(key);
+      if (val) return val;
+    }
+
+    return onboardingMemoryCache.get(key) || null;
+  },
 };
+
+const onboardingMemoryCache = new Map<string, string>();
+
+

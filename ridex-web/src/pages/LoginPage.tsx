@@ -19,10 +19,10 @@ export const LoginPage: React.FC = () => {
   const { user, isInitialized, initialize } = useAuthStore();
   const navigate = useNavigate();
 
-  // If already logged in, route immediately to dashboard
+  // If already logged in, route immediately to garage
   useEffect(() => {
     if (isInitialized && user) {
-      navigate('/dashboard', { replace: true });
+      navigate('/garage', { replace: true });
     }
   }, [user, isInitialized, navigate]);
 
@@ -39,7 +39,7 @@ export const LoginPage: React.FC = () => {
     try {
       await authService.signIn(email, password);
       await initialize();
-      navigate('/dashboard');
+      navigate('/garage');
     } catch (err: any) {
       console.error('[LoginPage] Sign in error:', err);
       setErrorMsg(err.message || 'Invalid email or password. Please verify and try again.');

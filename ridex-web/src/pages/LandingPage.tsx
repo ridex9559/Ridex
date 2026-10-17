@@ -15,10 +15,10 @@ export const LandingPage: React.FC = () => {
   const { user, isInitialized, isLoading } = useAuthStore();
   const navigate = useNavigate();
 
-  // If already authenticated, bypass startup screen directly into the active rider dashboard
+  // If already authenticated, bypass startup screen directly into the active garage
   useEffect(() => {
     if (isInitialized && user) {
-      navigate('/dashboard', { replace: true });
+      navigate('/garage', { replace: true });
     }
   }, [user, isInitialized, navigate]);
 

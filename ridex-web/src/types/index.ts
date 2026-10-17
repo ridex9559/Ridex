@@ -29,7 +29,8 @@ export interface Motorcycle {
   fuelTankCapacityL: number;
   avgMileageKmpl: number;
   isPrimary: boolean;
-  imageUrl?: string;
+  category?: string;
+  variant?: string;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string | null;
