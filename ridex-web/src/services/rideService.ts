@@ -370,6 +370,69 @@ export const rideService = {
   },
 
   /**
+   * Fetches all pending join requests across all rides hosted by this organizer.
+   */
+  async getHostPendingRequests(hostUserId: string): Promise<{
+    participantId: string;
+    rideId: string;
+    rideTitle: string;
+    userId: string;
+    user?: UserProfile;
+    joinedAt: string;
+  }[]> {
+    if (!hostUserId) return [];
+
+    try {
+      const { data: hostRides, error: ridesError } = await supabase
+        .from('rides')
+        .select('id, title')
+        .eq('organizer_id', hostUserId);
+
+      if (ridesError || !hostRides || hostRides.length === 0) return [];
+
+      const rideIds = hostRides.map((r: any) => r.id);
+      const rideMap = new Map(hostRides.map((r: any) => [r.id, r.title]));
+
+      const { data: participants, error: partError } = await supabase
+        .from('ride_participants')
+        .select(`
+          id,
+          ride_id,
+          user_id,
+          status,
+          joined_at,
+          user:profiles!ride_participants_user_id_fkey(id, full_name, username, avatar_url, city)
+        `)
+        .in('ride_id', rideIds)
+        .eq('status', 'pending')
+        .order('joined_at', { ascending: false });
+
+      if (partError || !participants) return [];
+
+      return participants.map((p: any) => ({
+        participantId: p.id,
+        rideId: p.ride_id,
+        rideTitle: rideMap.get(p.ride_id) || 'Squad Tour',
+        userId: p.user_id,
+        user: p.user
+          ? {
+              id: p.user.id,
+              fullName: p.user.full_name || 'Rider',
+              username: p.user.username || 'rider',
+              email: '',
+              avatarUrl: p.user.avatar_url,
+              city: p.user.city || 'Pune',
+            }
+          : undefined,
+        joinedAt: p.joined_at,
+      }));
+    } catch (err) {
+      console.warn('[rideService] getHostPendingRequests error:', err);
+      return [];
+    }
+  },
+
+  /**
    * Starts a live ride session (Organizer only).
    */
   async startLiveRide(rideId: string): Promise<boolean> {

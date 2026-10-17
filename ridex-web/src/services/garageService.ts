@@ -17,7 +17,6 @@ export const garageService = {
       .from('motorcycles')
       .select('*')
       .eq('user_id', userId)
-      .is('deleted_at', null)
       .order('is_primary', { ascending: false })
       .order('created_at', { ascending: false });
 
@@ -26,7 +25,9 @@ export const garageService = {
       return [];
     }
 
-    return (data || []).map((row: any) => ({
+    return (data || [])
+      .filter((row: any) => !row.deleted_at)
+      .map((row: any) => ({
       id: row.id,
       userId: row.user_id,
       manufacturer: row.manufacturer || 'Yamaha',
@@ -147,12 +148,20 @@ export const garageService = {
    * Deletes a motorcycle (soft delete with deleted_at timestamp).
    */
   async deleteMotorcycle(id: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error: softErr } = await supabase
       .from('motorcycles')
       .update({ deleted_at: new Date().toISOString(), is_primary: false })
       .eq('id', id);
 
-    return !error;
+    if (softErr) {
+      const { error: hardErr } = await supabase
+        .from('motorcycles')
+        .delete()
+        .eq('id', id);
+      return !hardErr;
+    }
+
+    return true;
   },
 
   /**
