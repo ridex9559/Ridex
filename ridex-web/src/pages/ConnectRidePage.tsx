@@ -3,13 +3,13 @@
  * Connects rider to group tours via 8-character join code and submits join request.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { rideService } from '../services/rideService';
 import { realtimeService } from '../services/realtimeService';
 import { useAuthStore } from '../stores/useAuthStore';
 import { RideEvent } from '../types';
-import { QrCode, Search, Radio, CheckCircle, ArrowRight, AlertCircle, ArrowLeft } from 'lucide-react';
+import { QrCode, Search, Radio, CheckCircle, ArrowRight, AlertCircle, ArrowLeft, RefreshCw } from 'lucide-react';
 
 export const ConnectRidePage: React.FC = () => {
   const { user } = useAuthStore();
@@ -17,9 +17,82 @@ export const ConnectRidePage: React.FC = () => {
 
   const [rideCode, setRideCode] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checkingApproval, setCheckingApproval] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [foundRide, setFoundRide] = useState<RideEvent | null>(null);
   const [requestStatus, setRequestStatus] = useState<'idle' | 'submitting' | 'submitted'>('idle');
+
+  // Real-time listener and fallback polling for Road Captain approval
+  useEffect(() => {
+    if (!foundRide || !user) return;
+    const isPending =
+      foundRide.userParticipationStatus === 'pending' || requestStatus === 'submitted';
+    if (!isPending) return;
+
+    // 1. WebSocket listener for instant approval event
+    const channel = realtimeService.subscribeToRide(foundRide.id, {
+      onApprovalStatus: (payload) => {
+        if (payload.userId === user.id) {
+          if (payload.status === 'APPROVED') {
+            setFoundRide((prev) =>
+              prev ? { ...prev, userParticipationStatus: 'approved' } : null
+            );
+            navigate(`/rides/${foundRide.id}`);
+          } else if (payload.status === 'REJECTED') {
+            setErrorMsg('Your join request was declined by the Road Captain.');
+            setRequestStatus('idle');
+            setFoundRide((prev) =>
+              prev ? { ...prev, userParticipationStatus: 'rejected' } : null
+            );
+          }
+        }
+      },
+    });
+
+    // 2. Continuous fallback polling (every 3.5s) to guarantee zero stuck states
+    const interval = setInterval(async () => {
+      try {
+        const fresh = await rideService.getRideById(foundRide.id, user.id);
+        if (fresh) {
+          if (fresh.userParticipationStatus === 'approved') {
+            clearInterval(interval);
+            setFoundRide(fresh);
+            navigate(`/rides/${fresh.id}`);
+          } else if (fresh.userParticipationStatus === 'rejected') {
+            clearInterval(interval);
+            setErrorMsg('Your join request was declined by the Road Captain.');
+            setRequestStatus('idle');
+            setFoundRide(fresh);
+          }
+        }
+      } catch {}
+    }, 3500);
+
+    return () => {
+      clearInterval(interval);
+      realtimeService.unsubscribeFromRide(foundRide.id);
+    };
+  }, [foundRide?.id, foundRide?.userParticipationStatus, requestStatus, user?.id, navigate]);
+
+  const handleManualCheckStatus = async () => {
+    if (!foundRide || !user) return;
+    setCheckingApproval(true);
+    try {
+      const fresh = await rideService.getRideById(foundRide.id, user.id);
+      if (fresh) {
+        setFoundRide(fresh);
+        if (fresh.userParticipationStatus === 'approved') {
+          navigate(`/rides/${fresh.id}`);
+        } else if (fresh.userParticipationStatus === 'rejected') {
+          setErrorMsg('Your join request was declined by the Road Captain.');
+          setRequestStatus('idle');
+        }
+      }
+    } catch {}
+    finally {
+      setCheckingApproval(false);
+    }
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +133,7 @@ export const ConnectRidePage: React.FC = () => {
         requestedAt: new Date().toISOString(),
       });
       setRequestStatus('submitted');
+      setFoundRide((prev) => (prev ? { ...prev, userParticipationStatus: 'pending' } : null));
     } catch (e: any) {
       setErrorMsg(e.message || 'Failed to submit join request.');
       setRequestStatus('idle');
@@ -190,17 +264,33 @@ export const ConnectRidePage: React.FC = () => {
             ) : foundRide.userParticipationStatus === 'pending' || requestStatus === 'submitted' ? (
               <div
                 style={{
-                  background: 'rgba(255, 176, 32, 0.15)',
+                  background: 'rgba(255, 176, 32, 0.12)',
                   border: '1px solid var(--gold)',
                   borderRadius: '10px',
-                  padding: '12px',
+                  padding: '14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
                   textAlign: 'center',
-                  fontSize: '0.85rem',
-                  color: 'var(--gold)',
-                  fontWeight: 600,
                 }}
               >
-                ✓ Join request is pending approval from Road Captain.
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--gold)', fontWeight: 700, fontSize: '0.9rem' }}>
+                  <Radio size={16} className="pulse-radar" />
+                  <span>Join Request Pending Approval</span>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  Awaiting Road Captain confirmation. Your screen will automatically advance once approved.
+                </div>
+                <button
+                  type="button"
+                  onClick={handleManualCheckStatus}
+                  disabled={checkingApproval}
+                  className="btn btn-secondary"
+                  style={{ minHeight: '32px', padding: '4px 10px', fontSize: '0.75rem', alignSelf: 'center' }}
+                >
+                  <RefreshCw size={12} className={checkingApproval ? 'spin' : ''} />
+                  <span>{checkingApproval ? 'Checking...' : 'Check Status Now'}</span>
+                </button>
               </div>
             ) : (
               <button

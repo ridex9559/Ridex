@@ -8,11 +8,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { rideService } from '../services/rideService';
 import { realtimeService } from '../services/realtimeService';
+import { mapService } from '../services/mapService';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useActiveRideStore } from '../stores/useActiveRideStore';
 import { LeafletMap } from '../components/maps/LeafletMap';
 import { SeparationBanner } from '../components/live/SeparationBanner';
-import { LiveRiderLocation, SosAlert } from '../types';
+import { LiveRiderLocation, SosAlert, RouteManeuver } from '../types';
+import { SosModal } from '../components/safety/SosModal';
 import {
   Compass,
   Radio,
@@ -25,7 +27,16 @@ import {
   Battery,
   AlertCircle,
   HelpCircle,
+  ShieldAlert,
+  CornerUpRight,
 } from 'lucide-react';
+
+function getCardinalDirection(heading?: number): string {
+  if (heading === undefined || heading === null) return '';
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  const index = Math.round(((heading %= 360) < 0 ? heading + 360 : heading) / 45) % 8;
+  return directions[index];
+}
 
 export const LiveRideCockpitPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,10 +49,12 @@ export const LiveRideCockpitPage: React.FC = () => {
     peerLocations,
     separationState,
     activeSos,
+    setActiveRideId,
     startTracking,
     stopTracking,
     updateMyLocation,
     updatePeerLocation,
+    setPeerLocations,
     triggerSos,
     clearSos,
   } = useActiveRideStore();
@@ -49,14 +62,59 @@ export const LiveRideCockpitPage: React.FC = () => {
   const [watchId, setWatchId] = useState<number | null>(null);
   const [gpsError, setGpsError] = useState('');
   const [showSosModal, setShowSosModal] = useState(false);
-  const [sosType, setSosType] = useState<'FLAT_TYRE' | 'MECHANICAL' | 'OUT_OF_FUEL' | 'MEDICAL' | 'LOST'>('MECHANICAL');
-  const [sosNote, setSosNote] = useState('');
+  const [routeCoordinates, setRouteCoordinates] = useState<[number, number][]>([]);
+  const [maneuvers, setManeuvers] = useState<RouteManeuver[]>([]);
 
   const { data: ride } = useQuery({
     queryKey: ['ride', id],
     queryFn: () => (id ? rideService.getRideById(id, user?.id) : Promise.resolve(null)),
     enabled: !!id,
   });
+
+  // Cold-start initialization: load existing active peer locations and clear stale SOS
+  useEffect(() => {
+    if (!id) return;
+    setActiveRideId(id);
+
+    // Initial fetch of active squad locations already published to Supabase
+    rideService.getRideLiveLocations(id).then((locations) => {
+      if (locations && locations.length > 0) {
+        setPeerLocations(locations);
+      }
+    });
+
+    // Check if an unresolved SOS emergency exists for this specific ride
+    rideService.getRideActiveSos(id).then((activeAlert) => {
+      if (activeAlert) {
+        triggerSos(activeAlert);
+      } else {
+        clearSos();
+      }
+    });
+  }, [id, setActiveRideId, setPeerLocations, triggerSos, clearSos]);
+
+  // Calculate genuine road-following route and turn-by-turn maneuvers via OSRM
+  useEffect(() => {
+    if (!ride) return;
+    const waypointsList = ride.checkpoints || [];
+    const allPoints = [
+      { latitude: ride.startLatitude, longitude: ride.startLongitude },
+      ...waypointsList.map((w) => ({ latitude: w.latitude, longitude: w.longitude })),
+      { latitude: ride.destinationLatitude, longitude: ride.destinationLongitude },
+    ];
+
+    mapService
+      .calculateRoute(allPoints)
+      .then((res) => {
+        if (res.coordinates && res.coordinates.length > 0) {
+          setRouteCoordinates(res.coordinates);
+        }
+        if (res.maneuvers && res.maneuvers.length > 0) {
+          setManeuvers(res.maneuvers);
+        }
+      })
+      .catch((err) => console.warn('[LiveCockpit] calculateRoute error:', err));
+  }, [ride]);
 
   // Subscribe to real-time telemetry channel
   useEffect(() => {
@@ -128,26 +186,6 @@ export const LiveRideCockpitPage: React.FC = () => {
         startTracking(id);
       }
     }
-  };
-
-  const handleSendSos = async () => {
-    if (!id || !user) return;
-    const alert: SosAlert = {
-      id: `sos-${Date.now()}`,
-      rideId: id,
-      userId: user.id,
-      riderName: user.fullName,
-      issueType: sosType,
-      latitude: myLocation?.latitude || 18.5204,
-      longitude: myLocation?.longitude || 73.8567,
-      note: sosNote.trim() || undefined,
-      status: 'ACTIVE',
-      createdAt: new Date().toISOString(),
-    };
-
-    triggerSos(alert);
-    await realtimeService.broadcastSos(id, alert);
-    setShowSosModal(false);
   };
 
   const allRiderMarkers = myLocation
@@ -223,12 +261,75 @@ export const LiveRideCockpitPage: React.FC = () => {
         </div>
       )}
 
-      {/* Full Map Canvas */}
+      {/* Full Map Canvas with Road-Following Route and Turn-by-Turn HUD */}
       <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden' }}>
+        {/* Turn-by-Turn Navigation Instruction Overlay */}
+        {maneuvers.length > 0 && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '12px',
+              left: '12px',
+              right: '12px',
+              background: 'rgba(8, 10, 15, 0.94)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid var(--border-cyan)',
+              borderRadius: '12px',
+              padding: '10px 14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              zIndex: 500,
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
+            }}
+          >
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                background: 'rgba(0, 229, 255, 0.15)',
+                border: '1px solid var(--border-cyan)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <CornerUpRight size={20} color="var(--cyan)" />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: '0.9rem',
+                  fontWeight: 800,
+                  color: '#FFF',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {maneuvers[0]?.instruction || 'Follow planned road route'}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', gap: '10px' }}>
+                <span className="mono" style={{ color: 'var(--cyan)', fontWeight: 700 }}>
+                  In {maneuvers[0]?.distanceMeters ? `${maneuvers[0].distanceMeters} m` : '500 m'}
+                </span>
+                {ride?.checkpoints && ride.checkpoints.length > 0 && (
+                  <span style={{ color: 'var(--text-muted)' }}>
+                    • Next Stop: {ride.checkpoints[0].name}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         <LeafletMap
           start={ride ? { name: ride.startLocationName, latitude: ride.startLatitude, longitude: ride.startLongitude } : null}
           destination={ride ? { name: ride.destinationName, latitude: ride.destinationLatitude, longitude: ride.destinationLongitude } : null}
           waypoints={ride?.checkpoints || []}
+          routeCoordinates={routeCoordinates}
           riderLocations={allRiderMarkers}
           currentUserId={user?.id}
           height="420px"
@@ -257,10 +358,10 @@ export const LiveRideCockpitPage: React.FC = () => {
             <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
               SPEED
             </div>
-            <div className="mono" style={{ fontSize: '1.8rem', fontWeight: 900, lineHeight: 1, color: 'var(--cyan)' }}>
-              {myLocation?.speed || 0}
+            <div className="mono" style={{ fontSize: '1.8rem', fontWeight: 900, lineHeight: 1, color: isTracking ? 'var(--cyan)' : 'var(--text-muted)' }}>
+              {isTracking ? (myLocation?.speed !== undefined ? myLocation.speed : 0) : '—'}
               <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginLeft: '4px' }}>
-                km/h
+                {isTracking ? 'km/h' : 'OFF'}
               </span>
             </div>
           </div>
@@ -270,8 +371,10 @@ export const LiveRideCockpitPage: React.FC = () => {
             <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
               HEADING
             </div>
-            <div className="mono" style={{ fontSize: '1.4rem', fontWeight: 700, lineHeight: 1, color: '#FFF' }}>
-              {myLocation?.heading ? `${Math.round(myLocation.heading)}°` : '—'}
+            <div className="mono" style={{ fontSize: '1.2rem', fontWeight: 700, lineHeight: 1, color: '#FFF' }}>
+              {isTracking && myLocation?.heading !== undefined
+                ? `${Math.round(myLocation.heading)}° ${getCardinalDirection(myLocation.heading)}`
+                : '—'}
             </div>
           </div>
 
@@ -287,23 +390,32 @@ export const LiveRideCockpitPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Tracking Actions */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
+      {/* Tracking & Safety Actions */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '8px' }}>
         <button
           onClick={handleToggleTracking}
           className={`btn ${isTracking ? 'btn-danger' : 'btn-primary'}`}
-          style={{ padding: '14px', fontSize: '1rem' }}
+          style={{ padding: '12px 10px', fontSize: '0.85rem' }}
         >
-          {isTracking ? <Square size={18} fill="#FFF" /> : <Play size={18} fill="#FFF" />}
-          <span>{isTracking ? 'Stop Live GPS Broadcast' : 'Start Live GPS Tracking'}</span>
+          {isTracking ? <Square size={16} fill="#FFF" /> : <Play size={16} fill="#FFF" />}
+          <span>{isTracking ? 'Stop GPS' : 'Start GPS'}</span>
+        </button>
+
+        <button
+          onClick={() => navigate(`/safety/${id}`)}
+          className="btn btn-secondary"
+          style={{ borderColor: 'var(--primary)', color: 'var(--primary)', fontWeight: 700, padding: '12px 8px', fontSize: '0.82rem' }}
+        >
+          <ShieldAlert size={16} />
+          <span>Safety & Voice</span>
         </button>
 
         <button
           onClick={() => setShowSosModal(true)}
           className="btn btn-secondary"
-          style={{ borderColor: 'var(--danger)', color: 'var(--danger)', fontWeight: 800 }}
+          style={{ borderColor: 'var(--danger)', color: 'var(--danger)', fontWeight: 800, padding: '12px 8px', fontSize: '0.82rem' }}
         >
-          <AlertTriangle size={18} />
+          <AlertTriangle size={16} />
           <span>SOS</span>
         </button>
       </div>
@@ -326,88 +438,21 @@ export const LiveRideCockpitPage: React.FC = () => {
         </div>
       </div>
 
-      {/* SOS Modal */}
+      {/* SOS Modal with 2-Step Confirmation & Offline Guidance */}
       {showSosModal && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.8)',
-            backdropFilter: 'blur(8px)',
-            zIndex: 1100,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '16px',
+        <SosModal
+          isOpen={showSosModal}
+          rideId={id || ''}
+          userId={user?.id || 'guest-rider'}
+          riderName={user?.fullName || 'Rider'}
+          currentLat={myLocation?.latitude}
+          currentLng={myLocation?.longitude}
+          onClose={() => setShowSosModal(false)}
+          onSuccess={(alert) => {
+            triggerSos(alert);
+            setShowSosModal(false);
           }}
-        >
-          <div
-            className="card-glass"
-            style={{
-              width: '100%',
-              maxWidth: '440px',
-              padding: '24px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-              border: '2px solid var(--danger)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <AlertTriangle size={24} color="var(--danger)" />
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--danger)' }}>
-                Trigger Squad SOS Alert
-              </h3>
-            </div>
-
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              Broadcasts your exact live coordinates and issue classification to all squad members immediately.
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Emergency Issue</label>
-              <select
-                value={sosType}
-                onChange={(e) => setSosType(e.target.value as any)}
-                className="form-input"
-              >
-                <option value="FLAT_TYRE">FLAT TYRE / PUNCTURE</option>
-                <option value="MECHANICAL">MECHANICAL BREAKDOWN</option>
-                <option value="OUT_OF_FUEL">OUT OF FUEL</option>
-                <option value="MEDICAL">MEDICAL ASSISTANCE NEEDED</option>
-                <option value="LOST">SEPARATED / LOST TRAIL</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Note to Squad (optional)</label>
-              <input
-                type="text"
-                placeholder="e.g. Near milestone 42 on the left shoulder"
-                value={sosNote}
-                onChange={(e) => setSosNote(e.target.value)}
-                className="form-input"
-              />
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' }}>
-              <button
-                type="button"
-                onClick={() => setShowSosModal(false)}
-                className="btn btn-secondary"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSendSos}
-                className="btn btn-danger"
-              >
-                Broadcast Emergency SOS
-              </button>
-            </div>
-          </div>
-        </div>
+        />
       )}
     </div>
   );

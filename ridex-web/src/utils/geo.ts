@@ -110,14 +110,26 @@ export function evaluateGroupSeparation(
     (r) => evaluateFreshness(r.updatedAt) === 'STALE'
   ).length;
 
-  if (validRiders.length <= 1) {
+  if (validRiders.length === 0) {
+    return {
+      status: 'OFFLINE',
+      maxSpreadMeters: 0,
+      leadDistanceMeters: 0,
+      activeRidersCount: 0,
+      staleRidersCount: staleCount,
+      message: 'Waiting for rider locations...',
+      separatedRiders: [],
+    };
+  }
+
+  if (validRiders.length === 1) {
     return {
       status: 'TOGETHER',
       maxSpreadMeters: 0,
       leadDistanceMeters: 0,
-      activeRidersCount: validRiders.length,
+      activeRidersCount: 1,
       staleRidersCount: staleCount,
-      message: validRiders.length === 1 ? 'Solo Rider Rendezvous' : 'Searching for live GPS beacons...',
+      message: 'Solo Rider Rendezvous • Waiting for squad members to start GPS',
       separatedRiders: [],
     };
   }

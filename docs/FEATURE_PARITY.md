@@ -32,11 +32,13 @@ The primary purpose is to:
 | **`(tabs)/home.tsx`** | **`DashboardPage.tsx`** | 🟡 **Partial** | Has tour list and quick actions. Needs rider stats summary (tours count, distance, quick bike widget, weather preview). |
 | **`rides/create.tsx`** | **`HostRidePage.tsx`** | ✅ **Complete** | Multi-stop routing with origin, destination, 3+ checkpoints, distance calculation, unique `RIDEX-XXXXX` Ride ID generation. |
 | **`rides/created-success.tsx`** | **`HostRidePage.tsx` (Step 4 Modal)** | ✅ **Complete** | Shows generated Ride ID with 1-click clipboard copy and direct link to ride overview. |
-| **`rides/[id].tsx`** | **`RideDetailsPage.tsx`** | ✅ **Complete** | Leaflet route preview, waypoint order sequence, participant approval/rejection, start tracking CTA. |
-| **`(tabs)/ride.tsx` & `rides/live/[id].tsx`** | **`LiveRideCockpitPage.tsx`** | ✅ **Complete** | Fullscreen radar map (now zero-watermark OSM dark), HUD speedometer, heading, cluster spread, geodesic hysteresis alerts, SOS trigger. |
-| **`community/`** & **`(tabs)/community.tsx`** | Missing | 🔴 **Missing** | Community squad feed and group discussions. |
-| **`rides/history.tsx` & `summary.tsx`** | **`DashboardPage.tsx`** (Tabs) | 🟡 **Partial** | Needs completed rides tab and post-ride distance/speed telemetry summary card. |
-| **`(tabs)/profile.tsx` & `settings/index.tsx`** | **`SettingsPage.tsx`** | 🟡 **Partial** | Has user profile and sign out. Needs rider statistics (total tours, distance, emergency contact, garage summary). |
+| **`rides/[id].tsx`** | **`RideDetailsPage.tsx`** | ✅ **Complete** | Leaflet route preview, waypoint order sequence, participant approval/rejection, start tracking CTA, and direct Safety Center navigation. |
+| **`(tabs)/ride.tsx` & `rides/live/[id].tsx`** | **`LiveRideCockpitPage.tsx`** | ✅ **Complete** | Fullscreen radar map (zero-watermark OSM dark), HUD speedometer, heading, cluster spread, geodesic hysteresis alerts, 2-step SOS modal, Safety Center link. |
+| **`safety/` (Safety Center)** | **`SafetyCenterPage.tsx`** | ✅ **Complete** | Tracking telemetry, GPS freshness, geodesic separation status, active SOS resolution, emergency dial links (112, 108), PTT walkie-talkie audio. |
+| **`community/` & `(tabs)/community.tsx`** | **`CommunityPage.tsx`** | ✅ **Complete** | Tabbed touring feed, motorcycle squad chapters, and verified rider achievements from authentic ride logs. |
+| **`rides/history.tsx` & `summary.tsx`** | **`RideHistoryPage.tsx`** | ✅ **Complete** | Full tour history logbook, filterable (Completed, Active, Hosted as Captain), planned vs recorded km, genuine aggregate statistics. |
+| **`(tabs)/profile.tsx` & `settings/index.tsx`** | **`ProfilePage.tsx`** | ✅ **Complete** | Authenticated rider credentials, callsign, bio, primary motorcycle telemetry, verified tour distance stats, and in-place profile editor. |
+| **`notifications/`** | **`NotificationCenterPage.tsx`** | ✅ **Complete** | In-app notification center with real-time Supabase subscription (`postgres_changes`), unread counter badge, mark-read actions, and honest browser delivery notes. |
 | **`auth/forgot-password.tsx`** | Missing | 🟡 **Low Priority** | Supabase Auth password reset request. |
 
 ---

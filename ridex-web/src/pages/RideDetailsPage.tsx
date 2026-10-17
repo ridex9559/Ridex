@@ -8,6 +8,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { rideService } from '../services/rideService';
 import { realtimeService } from '../services/realtimeService';
+import { mapService } from '../services/mapService';
 import { useAuthStore } from '../stores/useAuthStore';
 import { LeafletMap } from '../components/maps/LeafletMap';
 import {
@@ -25,6 +26,7 @@ import {
   AlertTriangle,
   ArrowLeft,
   Share2,
+  ShieldAlert,
 } from 'lucide-react';
 
 export const RideDetailsPage: React.FC = () => {
@@ -36,12 +38,33 @@ export const RideDetailsPage: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState('');
+  const [routeCoordinates, setRouteCoordinates] = useState<[number, number][]>([]);
 
   const { data: ride, isLoading, refetch } = useQuery({
     queryKey: ['ride', id, user?.id],
     queryFn: () => (id ? rideService.getRideById(id, user?.id) : Promise.resolve(null)),
     enabled: !!id,
   });
+
+  // Calculate genuine road-following route using OSRM
+  useEffect(() => {
+    if (!ride) return;
+    const waypointsList = ride.checkpoints || [];
+    const allPoints = [
+      { latitude: ride.startLatitude, longitude: ride.startLongitude },
+      ...waypointsList.map((w) => ({ latitude: w.latitude, longitude: w.longitude })),
+      { latitude: ride.destinationLatitude, longitude: ride.destinationLongitude },
+    ];
+
+    mapService
+      .calculateRoute(allPoints)
+      .then((res) => {
+        if (res.coordinates && res.coordinates.length > 0) {
+          setRouteCoordinates(res.coordinates);
+        }
+      })
+      .catch((err) => console.warn('[RideDetailsPage] calculateRoute error:', err));
+  }, [ride]);
 
   // Subscribe to real-time events for this ride
   useEffect(() => {
@@ -144,6 +167,7 @@ export const RideDetailsPage: React.FC = () => {
     setActionLoading(true);
     try {
       await rideService.startLiveRide(id);
+      await realtimeService.broadcastRideStatus(id, 'active');
       refetch();
       navigate(`/rides/live/${id}`);
     } catch (e) {
@@ -158,6 +182,7 @@ export const RideDetailsPage: React.FC = () => {
     setActionLoading(true);
     try {
       await rideService.endLiveRide(id);
+      await realtimeService.broadcastRideStatus(id, 'completed');
       refetch();
     } catch (e) {
       console.error(e);
@@ -209,14 +234,14 @@ export const RideDetailsPage: React.FC = () => {
           <span>All Rides</span>
         </button>
 
-        {isLive && (
+        {isApprovedParticipant && (
           <button
             onClick={() => navigate(`/rides/live/${ride.id}`)}
-            className="btn btn-cyan"
+            className={isLive ? "btn btn-cyan" : "btn btn-primary"}
             style={{ minHeight: '36px', padding: '6px 14px', fontSize: '0.85rem' }}
           >
-            <Radio size={16} className="pulse-radar" />
-            <span>Enter Live Cockpit</span>
+            <Radio size={16} className={isLive ? "pulse-radar" : ""} />
+            <span>{isLive ? 'Enter Live Cockpit' : 'Enter Squad Lobby'}</span>
           </button>
         )}
       </div>
@@ -335,6 +360,15 @@ export const RideDetailsPage: React.FC = () => {
                 <span>Conclude Tour</span>
               </button>
             )}
+
+            <button
+              onClick={() => navigate(`/safety/${ride.id}`)}
+              className="btn btn-secondary"
+              style={{ minHeight: '36px', padding: '6px 14px', fontSize: '0.85rem' }}
+            >
+              <ShieldAlert size={14} color="var(--gold)" />
+              <span>Safety Center</span>
+            </button>
           </div>
         )}
       </div>
@@ -346,6 +380,7 @@ export const RideDetailsPage: React.FC = () => {
           start={{ name: ride.startLocationName, latitude: ride.startLatitude, longitude: ride.startLongitude }}
           destination={{ name: ride.destinationName, latitude: ride.destinationLatitude, longitude: ride.destinationLongitude }}
           waypoints={waypoints}
+          routeCoordinates={routeCoordinates}
           height="320px"
         />
       </div>

@@ -4,7 +4,16 @@
  */
 
 import { supabase } from './supabase';
-import { RideEvent, RideCheckpoint, RideParticipant, RideStatus, ParticipantRole, ParticipantApprovalStatus } from '../types';
+import {
+  RideEvent,
+  RideCheckpoint,
+  RideParticipant,
+  RideStatus,
+  ParticipantRole,
+  ParticipantApprovalStatus,
+  LiveRiderLocation,
+  SosAlert,
+} from '../types';
 import { mapService } from './mapService';
 
 /**
@@ -460,6 +469,136 @@ export const rideService = {
       .eq('id', rideId);
 
     return !error;
+  },
+
+  /**
+   * Fetches latest live GPS positions for active squad participants.
+   */
+  async getRideLiveLocations(rideId: string): Promise<LiveRiderLocation[]> {
+    if (!rideId) return [];
+    try {
+      const { data, error } = await supabase
+        .from('ride_locations')
+        .select(`
+          ride_id,
+          user_id,
+          latitude,
+          longitude,
+          heading,
+          speed,
+          accuracy,
+          is_sharing,
+          updated_at,
+          user:profiles!ride_locations_user_id_fkey(id, full_name, username)
+        `)
+        .eq('ride_id', rideId)
+        .eq('is_sharing', true);
+
+      if (error || !data) {
+        console.warn('[rideService] getRideLiveLocations query warning:', error);
+        return [];
+      }
+
+      return data.map((row: any) => ({
+        userId: row.user_id,
+        riderName: row.user?.full_name || row.user?.username || 'Rider',
+        latitude: Number(row.latitude),
+        longitude: Number(row.longitude),
+        heading: Number(row.heading || 0),
+        speed: Number(row.speed || 0),
+        accuracy: Number(row.accuracy || 0),
+        updatedAt: row.updated_at || new Date().toISOString(),
+      }));
+    } catch (err) {
+      console.warn('[rideService] getRideLiveLocations error:', err);
+      return [];
+    }
+  },
+
+  /**
+   * Checks if an active, unresolved SOS alert exists for this ride.
+   */
+  async getRideActiveSos(rideId: string): Promise<SosAlert | null> {
+    if (!rideId) return null;
+    try {
+      const { data, error } = await supabase
+        .from('ride_sos_alerts')
+        .select(`
+          *,
+          user:profiles!ride_sos_alerts_user_id_fkey(full_name, username)
+        `)
+        .eq('ride_id', rideId)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error || !data) return null;
+
+      return {
+        id: data.id,
+        rideId: data.ride_id,
+        userId: data.user_id,
+        riderName: data.user?.full_name || data.user?.username || 'Rider',
+        issueType: data.issue_type || 'MEDICAL',
+        latitude: Number(data.latitude || 0),
+        longitude: Number(data.longitude || 0),
+        note: data.note,
+        createdAt: data.created_at,
+      };
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Fetches all rides hosted or joined by a user (completed, active, published).
+   */
+  async getUserRides(userId: string): Promise<RideEvent[]> {
+    if (!userId) return [];
+    try {
+      // 1. Fetch hosted rides
+      const { data: hosted = [] } = await supabase
+        .from('rides')
+        .select(`
+          *,
+          organizer:profiles!rides_organizer_id_fkey(id, full_name, username, avatar_url, city)
+        `)
+        .eq('organizer_id', userId)
+        .order('ride_date', { ascending: false });
+
+      // 2. Fetch joined rides via ride_participants
+      const { data: participations = [] } = await supabase
+        .from('ride_participants')
+        .select(`
+          ride_id,
+          status,
+          role,
+          ride:rides!ride_participants_ride_id_fkey(
+            *,
+            organizer:profiles!rides_organizer_id_fkey(id, full_name, username, avatar_url, city)
+          )
+        `)
+        .eq('user_id', userId)
+        .eq('status', 'approved');
+
+      const joinedRides = (participations || [])
+        .map((p: any) => p.ride)
+        .filter(Boolean);
+
+      // Merge and deduplicate by ID
+      const allRidesMap = new Map<string, any>();
+      [...(hosted || []), ...joinedRides].forEach((r: any) => {
+        if (!allRidesMap.has(r.id)) {
+          allRidesMap.set(r.id, r);
+        }
+      });
+
+      return Array.from(allRidesMap.values()).map(this.mapDbRowToRideEvent);
+    } catch (e) {
+      console.warn('[rideService] getUserRides fallback:', e);
+      return [];
+    }
   },
 
   /**

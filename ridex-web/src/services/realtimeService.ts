@@ -139,6 +139,20 @@ export const realtimeService = {
   },
 
   /**
+   * Broadcasts ride status transition (e.g. active, completed).
+   */
+  async broadcastRideStatus(rideId: string, status: string): Promise<void> {
+    const channel = activeChannels.get(rideId);
+    if (channel) {
+      await channel.send({
+        type: 'broadcast',
+        event: 'ride_status',
+        payload: { status },
+      });
+    }
+  },
+
+  /**
    * Broadcasts active SOS emergency alert.
    */
   async broadcastSos(rideId: string, alert: SosAlert): Promise<void> {

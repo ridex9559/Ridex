@@ -22,17 +22,19 @@ interface ActiveRideState {
   stopTracking: () => void;
   updateMyLocation: (location: LiveRiderLocation) => void;
   updatePeerLocation: (location: LiveRiderLocation) => void;
+  setPeerLocations: (locations: LiveRiderLocation[]) => void;
   triggerSos: (alert: SosAlert) => void;
   clearSos: () => void;
+  resetRideState: () => void;
 }
 
 const initialSeparationState: GroupSeparationState = {
-  status: 'TOGETHER',
+  status: 'OFFLINE',
   maxSpreadMeters: 0,
   leadDistanceMeters: 0,
-  activeRidersCount: 1,
+  activeRidersCount: 0,
   staleRidersCount: 0,
-  message: 'Squad together within safe distance.',
+  message: 'Waiting for rider locations...',
   separatedRiders: [],
 };
 
@@ -45,7 +47,19 @@ export const useActiveRideStore = create<ActiveRideState>((set, get) => ({
   activeSos: null,
   permissionGranted: false,
 
-  setActiveRideId: (rideId) => set({ activeRideId: rideId }),
+  setActiveRideId: (rideId) => {
+    const current = get().activeRideId;
+    if (current !== rideId) {
+      set({
+        activeRideId: rideId,
+        peerLocations: {},
+        myLocation: null,
+        isTracking: false,
+        activeSos: null,
+        separationState: initialSeparationState,
+      });
+    }
+  },
 
   setPermissionGranted: (granted) => set({ permissionGranted: granted }),
 
@@ -94,7 +108,39 @@ export const useActiveRideStore = create<ActiveRideState>((set, get) => ({
     });
   },
 
+  setPeerLocations: (locations) => {
+    const { myLocation, separationState } = get();
+    const peersMap: Record<string, LiveRiderLocation> = {};
+    locations.forEach((loc) => {
+      if (loc.userId !== myLocation?.userId) {
+        peersMap[loc.userId] = loc;
+      }
+    });
+
+    const allRiders = myLocation ? [myLocation, ...Object.values(peersMap)] : Object.values(peersMap);
+    const newSeparation = evaluateGroupSeparation(
+      allRiders,
+      myLocation?.userId,
+      separationState.status
+    );
+
+    set({
+      peerLocations: peersMap,
+      separationState: newSeparation,
+    });
+  },
+
   triggerSos: (alert) => set({ activeSos: alert }),
 
   clearSos: () => set({ activeSos: null }),
+
+  resetRideState: () =>
+    set({
+      activeRideId: null,
+      isTracking: false,
+      myLocation: null,
+      peerLocations: {},
+      separationState: initialSeparationState,
+      activeSos: null,
+    }),
 }));

@@ -147,3 +147,93 @@ export interface SosAlert {
   status: 'ACTIVE' | 'RESOLVED';
   createdAt: string;
 }
+
+export interface CommunityPost {
+  id: string;
+  userId: string;
+  rideId?: string;
+  motorcycleId?: string;
+  caption: string;
+  locationName?: string;
+  visibility: 'public' | 'followers' | 'private';
+  likesCount: number;
+  commentsCount: number;
+  isLikedByMe?: boolean;
+  user?: UserProfile;
+  rideTitle?: string;
+  createdAt: string;
+}
+
+export interface PostComment {
+  id: string;
+  postId: string;
+  userId: string;
+  content: string;
+  user?: UserProfile;
+  createdAt: string;
+}
+
+export interface RiderGroup {
+  id: string;
+  name: string;
+  description: string;
+  region?: string;
+  badge?: string;
+  coverImageUrl?: string;
+  avatarUrl?: string;
+  createdBy: string;
+  privacy: 'public' | 'private';
+  membersCount: number;
+  isJoinedByMe?: boolean;
+  myRole?: 'owner' | 'admin' | 'member';
+  createdAt: string;
+}
+
+export interface Achievement {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  icon: string;
+  category: 'milestone' | 'speed' | 'lean' | 'elevation' | 'distance' | 'social';
+  requirementValue: number;
+  unit: string;
+  isEarned: boolean;
+  earnedAt?: string;
+  progress: number;
+}
+
+export interface AppNotification {
+  id: string;
+  userId: string;
+  title: string;
+  body: string;
+  type: 'RIDE_REQUEST' | 'RIDE_APPROVAL' | 'SOS_ALERT' | 'SEPARATION_WARNING' | 'COMMUNITY' | 'GENERAL';
+  isRead: boolean;
+  linkUrl?: string;
+  createdAt: string;
+}
+
+export interface VoiceChannelState {
+  id: string;
+  rideId: string;
+  name: string;
+  state: 'DISCONNECTED' | 'CONNECTING' | 'CONNECTED' | 'TRANSMITTING';
+  activeSpeaker: {
+    userId: string;
+    userName: string;
+  } | null;
+  participantsCount: number;
+  isMuted: boolean;
+  micPermission: 'prompt' | 'granted' | 'denied' | 'unsupported';
+}
+
+export interface RouteManeuver {
+  instruction: string;
+  type: string;
+  modifier?: string;
+  distanceMeters: number;
+  durationSeconds: number;
+  location: [number, number]; // [lat, lng]
+}
+

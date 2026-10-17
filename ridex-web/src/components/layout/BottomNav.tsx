@@ -5,16 +5,19 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Compass, Warehouse, PlusCircle, QrCode, User } from 'lucide-react';
+import { Compass, Warehouse, ShieldAlert, Users, User } from 'lucide-react';
+import { useActiveRideStore } from '../../stores/useActiveRideStore';
 
 export const BottomNav: React.FC = () => {
+  const { activeSos } = useActiveRideStore();
+
   return (
     <nav className="bottom-nav">
       <NavLink
         to="/garage"
         className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
       >
-        <Warehouse size={22} />
+        <Warehouse size={20} />
         <span>Garage</span>
       </NavLink>
 
@@ -22,31 +25,31 @@ export const BottomNav: React.FC = () => {
         to="/dashboard"
         className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
       >
-        <Compass size={22} />
+        <Compass size={20} />
         <span>Rides</span>
       </NavLink>
 
       <NavLink
-        to="/host"
+        to="/safety"
         className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
       >
-        <PlusCircle size={24} color="var(--primary)" />
-        <span style={{ color: 'var(--primary)', fontWeight: 700 }}>Host Ride</span>
+        <ShieldAlert size={22} color={activeSos ? 'var(--danger)' : 'var(--primary)'} />
+        <span style={{ color: activeSos ? 'var(--danger)' : 'var(--primary)', fontWeight: 700 }}>Safety</span>
       </NavLink>
 
       <NavLink
-        to="/connect"
+        to="/community"
         className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
       >
-        <QrCode size={22} />
-        <span>Connect</span>
+        <Users size={20} />
+        <span>Community</span>
       </NavLink>
 
       <NavLink
-        to="/settings"
+        to="/profile"
         className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
       >
-        <User size={22} />
+        <User size={20} />
         <span>Profile</span>
       </NavLink>
     </nav>

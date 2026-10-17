@@ -12,6 +12,58 @@ interface SeparationBannerProps {
 }
 
 export const SeparationBanner: React.FC<SeparationBannerProps> = ({ state }) => {
+  if (state.status === 'OFFLINE' || state.activeRidersCount === 0) {
+    return (
+      <div
+        style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: '12px',
+          padding: '10px 14px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+        }}
+      >
+        <Radio size={20} color="var(--text-muted)" className="pulse-radar" />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+            Waiting for rider locations
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+            Start GPS tracking or await squad member check-in
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (state.activeRidersCount === 1) {
+    return (
+      <div
+        style={{
+          background: 'rgba(0, 229, 255, 0.08)',
+          border: '1px solid var(--border-cyan)',
+          borderRadius: '12px',
+          padding: '10px 14px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+        }}
+      >
+        <Radio size={20} color="var(--cyan)" />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--cyan)' }}>
+            Solo Rider Tracking
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+            1 rider active • Waiting for squad members to start tracking
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (state.status === 'TOGETHER') {
     return (
       <div

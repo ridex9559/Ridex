@@ -7,12 +7,26 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useActiveRideStore } from '../../stores/useActiveRideStore';
-import { Radio, Compass, ShieldAlert } from 'lucide-react';
+import { Radio, Compass, ShieldAlert, Bell, Users } from 'lucide-react';
+import { notificationService } from '../../services/notificationService';
 
 export const Header: React.FC = () => {
   const { user } = useAuthStore();
-  const { isTracking, activeRideId } = useActiveRideStore();
+  const { isTracking, activeRideId, activeSos } = useActiveRideStore();
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!user?.id) return;
+    notificationService.getNotifications(user.id).then(notifs => {
+      setUnreadCount(notifs.filter(n => !n.isRead).length);
+    });
+
+    const unsubscribe = notificationService.subscribeToNotifications(user.id, () => {
+      setUnreadCount(prev => prev + 1);
+    });
+    return () => unsubscribe();
+  }, [user?.id]);
 
   return (
     <header
@@ -53,8 +67,9 @@ export const Header: React.FC = () => {
           </div>
         </Link>
 
-        {/* Live Telemetry Status & User Profile */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Live Telemetry Status, Safety Quick Access & Notifications */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Active Live Cockpit Beacon */}
           {isTracking && activeRideId && (
             <Link
               to={`/rides/live/${activeRideId}`}
@@ -62,13 +77,82 @@ export const Header: React.FC = () => {
               style={{ textDecoration: 'none', padding: '6px 12px' }}
             >
               <Radio size={14} className="pulse-radar" />
-              <span>LIVE COCKPIT</span>
+              <span className="hidden sm:inline">LIVE COCKPIT</span>
+            </Link>
+          )}
+
+          {/* Safety Center Quick Link */}
+          <Link
+            to={activeRideId ? `/safety/${activeRideId}` : '/safety'}
+            className="card-interactive"
+            title="Safety Center & Emergency Intercom"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 10px',
+              borderRadius: '10px',
+              background: activeSos ? 'rgba(255, 59, 48, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              border: activeSos ? '1px solid var(--danger)' : '1px solid var(--border-card)',
+              color: activeSos ? 'var(--danger)' : 'var(--text-secondary)',
+              textDecoration: 'none',
+              fontSize: '0.78rem',
+              fontWeight: 600,
+            }}
+          >
+            <ShieldAlert size={16} color={activeSos ? 'var(--danger)' : 'var(--gold)'} />
+            <span className="hidden md:inline">Safety</span>
+          </Link>
+
+          {/* Notifications Bell */}
+          {user && (
+            <Link
+              to="/notifications"
+              className="card-interactive"
+              title="Notifications"
+              style={{
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                borderRadius: '10px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid var(--border-card)',
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+              }}
+            >
+              <Bell size={16} />
+              {unreadCount > 0 && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '-2px',
+                    right: '-2px',
+                    background: 'var(--primary)',
+                    color: '#000',
+                    fontSize: '0.6rem',
+                    fontWeight: 800,
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </Link>
           )}
 
           {user ? (
             <Link
-              to="/settings"
+              to="/profile"
+              title="Rider Profile"
               style={{
                 display: 'flex',
                 alignItems: 'center',
