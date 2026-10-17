@@ -31,20 +31,18 @@ export const Header: React.FC = () => {
       <div className="desktop-wrapper flex items-center justify-between" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Brand Mark */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
-          <div
+          <img
+            src="/ridex-logo.png"
+            alt="RIDEX"
             style={{
-              width: '36px',
-              height: '36px',
+              width: '38px',
+              height: '38px',
               borderRadius: '10px',
-              background: 'linear-gradient(135deg, #FF6B00, #FF8533)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 10px rgba(255, 107, 0, 0.4)',
+              objectFit: 'cover',
+              border: '1px solid var(--border-subtle)',
+              boxShadow: '0 2px 8px rgba(255, 107, 0, 0.3)',
             }}
-          >
-            <Compass size={20} color="#FFFFFF" />
-          </div>
+          />
           <div>
             <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.03em', lineHeight: 1 }}>
               RIDE<span style={{ color: 'var(--primary)' }}>X</span>

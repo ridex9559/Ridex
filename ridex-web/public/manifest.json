@@ -9,6 +9,12 @@
   "theme_color": "#FF6B00",
   "icons": [
     {
+      "src": "/ridex-logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "/favicon.svg",
       "sizes": "192x192 512x512",
       "type": "image/svg+xml",

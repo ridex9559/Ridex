@@ -51,10 +51,10 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         attributionControl: true,
       });
 
-      // CARTO Dark Matter Tiles
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
+      // OpenStreetMap with Dark Adventure Theme (Zero Watermarks / Zero API Key Requirement)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        className: 'dark-map-tiles',
         maxZoom: 19,
       }).addTo(map);
 

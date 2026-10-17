@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from './stores/useAuthStore';
 import { Header } from './components/layout/Header';
@@ -33,6 +33,35 @@ const queryClient = new QueryClient({
   },
 });
 
+const AppShell: React.FC = () => {
+  const location = useLocation();
+  const isStartupOrAuth = ['/', '/login', '/register'].includes(location.pathname);
+
+  return (
+    <div className={`app-container ${isStartupOrAuth ? 'no-nav' : ''}`}>
+      {!isStartupOrAuth && <Header />}
+
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/garage" element={<GaragePage />} />
+          <Route path="/host" element={<HostRidePage />} />
+          <Route path="/rides/:id" element={<RideDetailsPage />} />
+          <Route path="/rides/live/:id" element={<LiveRideCockpitPage />} />
+          <Route path="/connect" element={<ConnectRidePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </main>
+
+      {!isStartupOrAuth && <BottomNav />}
+    </div>
+  );
+};
+
 export const App: React.FC = () => {
   const { initialize } = useAuthStore();
 
@@ -44,27 +73,7 @@ export const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
         <BrowserRouter>
-          <div className="app-container">
-            <Header />
-
-            <main style={{ flex: 1 }}>
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/garage" element={<GaragePage />} />
-                <Route path="/host" element={<HostRidePage />} />
-                <Route path="/rides/:id" element={<RideDetailsPage />} />
-                <Route path="/rides/live/:id" element={<LiveRideCockpitPage />} />
-                <Route path="/connect" element={<ConnectRidePage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
-              </Routes>
-            </main>
-
-            <BottomNav />
-          </div>
+          <AppShell />
         </BrowserRouter>
       </ErrorBoundary>
     </QueryClientProvider>

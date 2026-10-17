@@ -370,3 +370,53 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* ==========================================================================
+   Mobile-First Form Inputs (Prevents iOS Safari auto-zoom on <16px font)
+   ========================================================================== */
+.form-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  font-size: 16px; /* iOS Safari requires >= 16px to prevent viewport zoom */
+  font-family: var(--font-body);
+  background: rgba(18, 23, 34, 0.85);
+  color: var(--text-primary);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  -webkit-appearance: none;
+}
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.form-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* App container without bottom navigation bar (Startup & Auth screens) */
+.app-container.no-nav {
+  padding-bottom: 0 !important;
+}
+
+/* ==========================================================================
+   OpenStreetMap Dark Mode Filter (Zero API Key / Zero Watermarks)
+   ========================================================================== */
+.dark-map-tiles .leaflet-tile {
+  filter: brightness(0.65) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.25) brightness(0.7) !important;
+}
+
+/* ==========================================================================
+   Accessibility & Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
