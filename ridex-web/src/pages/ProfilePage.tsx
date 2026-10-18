@@ -430,25 +430,26 @@ export const ProfilePage: React.FC = () => {
       </div>
 
       {/* Primary Motorcycle Card */}
-      <div className="card-glass" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      <div className="rx-cockpit-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
-                width: '38px',
-                height: '38px',
+                width: '40px',
+                height: '40px',
                 borderRadius: '10px',
-                background: 'rgba(255, 107, 0, 0.15)',
+                background: 'rgba(255, 107, 0, 0.12)',
+                border: '1px solid rgba(255, 107, 0, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: 'var(--primary)',
               }}
             >
-              <Bike size={20} />
+              <Bike size={22} />
             </div>
             <div>
-              <h3 style={{ fontSize: '0.98rem', fontWeight: 800, color: '#FFFFFF' }}>Primary Motorcycle Machine</h3>
+              <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#FFFFFF' }}>Primary Motorcycle Machine</h3>
               <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>Configured touring telemetry from Garage</p>
             </div>
           </div>
@@ -456,65 +457,83 @@ export const ProfilePage: React.FC = () => {
           <button
             onClick={() => navigate('/garage')}
             className="btn btn-secondary"
-            style={{ minHeight: '32px', padding: '4px 10px', fontSize: '0.76rem' }}
+            style={{ minHeight: '34px', padding: '6px 12px', fontSize: '0.78rem' }}
           >
             <span>Garage</span>
-            <ChevronRight size={13} />
+            <ChevronRight size={14} />
           </button>
         </div>
 
         {primaryBike ? (
           <div
             style={{
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border-card)',
+              background: 'rgba(11, 14, 20, 0.9)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: '14px',
-              padding: '14px 18px',
+              padding: '16px',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '12px',
+              flexDirection: 'column',
+              gap: '14px',
             }}
           >
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 800, fontSize: '1rem', color: '#FFFFFF' }}>
-                  {primaryBike.year} {primaryBike.manufacturer} {primaryBike.model}
-                </span>
-                <span className="badge" style={{ background: 'rgba(0, 230, 118, 0.15)', color: 'var(--success)', border: '1px solid var(--success)' }}>
-                  PRIMARY
-                </span>
-              </div>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '3px' }}>
-                {primaryBike.displacementCc}cc • {primaryBike.color} • Tank: {primaryBike.fuelTankCapacityL}L
-              </p>
-              {primaryBike.registrationNumber && (
-                <p style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', marginTop: '2px' }}>
-                  REG: {primaryBike.registrationNumber}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontWeight: 800, fontSize: '1.05rem', color: '#FFFFFF' }}>
+                    {primaryBike.year} {primaryBike.manufacturer} {primaryBike.model}
+                  </span>
+                  <span className="badge" style={{ background: 'rgba(0, 230, 118, 0.15)', color: 'var(--success)', border: '1px solid rgba(0, 230, 118, 0.3)' }}>
+                    PRIMARY MACHINE
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                  {primaryBike.color} touring setup
                 </p>
+              </div>
+
+              {primaryBike.registrationNumber && (
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--cyan)', background: 'rgba(0, 240, 255, 0.08)', border: '1px solid rgba(0, 240, 255, 0.25)', padding: '4px 10px', borderRadius: '6px' }}>
+                  {primaryBike.registrationNumber}
+                </div>
               )}
             </div>
 
-            <div
-              className="badge"
-              style={{
-                background: 'rgba(0, 229, 255, 0.1)',
-                color: 'var(--cyan)',
-                border: '1px solid rgba(0, 229, 255, 0.3)',
-                padding: '6px 12px',
-                fontFamily: 'var(--font-mono)',
-              }}
-            >
-              {primaryBike.fuelEfficiencyKmpl ? `${primaryBike.fuelEfficiencyKmpl} km/l` : 'Touring Spec'}
+            {/* 4-Box Telemetry Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '8px' }}>
+              <div className="machine-spec-box">
+                <span className="machine-spec-label">Displacement</span>
+                <span className="machine-spec-val" style={{ color: 'var(--primary)' }}>
+                  {primaryBike.displacementCc} CC
+                </span>
+              </div>
+              <div className="machine-spec-box">
+                <span className="machine-spec-label">Fuel Tank</span>
+                <span className="machine-spec-val">
+                  {primaryBike.fuelTankCapacityL} L
+                </span>
+              </div>
+              <div className="machine-spec-box">
+                <span className="machine-spec-label">Avg Mileage</span>
+                <span className="machine-spec-val">
+                  {primaryBike.fuelEfficiencyKmpl ? `${primaryBike.fuelEfficiencyKmpl} KM/L` : '—'}
+                </span>
+              </div>
+              <div className="machine-spec-box">
+                <span className="machine-spec-label">Safe Range</span>
+                <span className="machine-spec-val" style={{ color: 'var(--cyan)' }}>
+                  {primaryBike.fuelTankCapacityL && primaryBike.fuelEfficiencyKmpl
+                    ? `~${Math.round(primaryBike.fuelTankCapacityL * primaryBike.fuelEfficiencyKmpl * 0.9)} KM`
+                    : '—'}
+                </span>
+              </div>
             </div>
           </div>
         ) : (
-          <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: '12px', border: '1px dashed var(--border-subtle)' }}>
+          <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-muted)', background: 'rgba(11, 14, 20, 0.6)', borderRadius: '12px', border: '1px dashed rgba(255, 255, 255, 0.08)' }}>
             <p style={{ fontSize: '0.82rem' }}>No motorcycle configured in digital garage yet.</p>
             <button
               onClick={() => navigate('/garage')}
-              style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer', marginTop: '6px' }}
+              style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', marginTop: '8px' }}
             >
               Configure Bike in Garage →
             </button>

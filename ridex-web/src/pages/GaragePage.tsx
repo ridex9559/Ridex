@@ -265,32 +265,31 @@ export const GaragePage: React.FC = () => {
           ========================================================================= */}
       {needsOnboarding && (
         <div
-          className="card-glass"
+          className="rx-cockpit-panel"
           style={{
-            padding: '32px 20px',
-            border: '1px solid var(--border-active)',
-            background: 'linear-gradient(180deg, rgba(26, 34, 52, 0.95) 0%, rgba(18, 23, 34, 0.98) 100%)',
+            padding: '28px 20px',
+            border: '1px solid var(--ridex-border)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             textAlign: 'center',
-            gap: '20px',
-            boxShadow: '0 12px 36px -10px var(--primary-glow)',
+            gap: '18px',
           }}
         >
           <div
             style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '20px',
-              background: 'linear-gradient(135deg, var(--primary), #FFA066)',
+              width: '54px',
+              height: '54px',
+              borderRadius: '16px',
+              background: 'linear-gradient(135deg, rgba(255, 107, 0, 0.2) 0%, rgba(255, 107, 0, 0.05) 100%)',
+              border: '1px solid rgba(255, 107, 0, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 6px 24px var(--primary-glow)',
+              boxShadow: '0 4px 14px -2px rgba(255, 107, 0, 0.25)',
             }}
           >
-            <Bike size={34} color="#FFFFFF" />
+            <Bike size={28} color="var(--ridex-orange)" />
           </div>
 
           <div>
@@ -299,25 +298,26 @@ export const GaragePage: React.FC = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '4px 12px',
+                padding: '3px 10px',
                 borderRadius: '9999px',
-                background: 'rgba(255, 107, 0, 0.15)',
-                color: 'var(--primary)',
-                fontSize: '0.75rem',
-                fontWeight: 700,
+                background: 'rgba(255, 107, 0, 0.12)',
+                border: '1px solid rgba(255, 107, 0, 0.3)',
+                color: 'var(--ridex-orange)',
+                fontSize: '0.72rem',
+                fontWeight: 800,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
                 marginBottom: '8px',
               }}
             >
-              <Sparkles size={14} />
-              <span>Rider Setup</span>
+              <Sparkles size={13} />
+              <span>Rider Hangar</span>
             </div>
-            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, lineHeight: 1.2 }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 850, lineHeight: 1.2, color: '#FFFFFF' }}>
               Welcome to your RIDEX Garage
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', maxWidth: '480px', margin: '6px auto 0' }}>
-              Let's set up your ride. Register your motorcycle for telemetry and fuel calculations, or explore as a co-rider.
+            <p style={{ color: 'var(--ridex-muted)', fontSize: '0.88rem', maxWidth: '460px', margin: '6px auto 0', lineHeight: 1.45 }}>
+              Register your motorcycle for calibrated fuel range and telemetry, or explore as a co-rider with zero vehicle restrictions.
             </p>
           </div>
 
@@ -326,10 +326,10 @@ export const GaragePage: React.FC = () => {
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '16px',
+              gap: '14px',
               width: '100%',
               maxWidth: '680px',
-              marginTop: '8px',
+              marginTop: '4px',
             }}
           >
             {/* Option A: Add My Motorcycle */}
@@ -340,9 +340,9 @@ export const GaragePage: React.FC = () => {
                 setShowAddModal(true);
               }}
               style={{
-                padding: '24px 20px',
+                padding: '20px 18px',
                 textAlign: 'left',
-                border: '1.5px solid var(--border-active)',
+                border: '1px solid rgba(255, 107, 0, 0.4)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -352,18 +352,18 @@ export const GaragePage: React.FC = () => {
             >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255, 107, 0, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Plus size={20} color="var(--primary)" />
+                  <div style={{ width: '34px', height: '34px', borderRadius: '9px', background: 'rgba(255, 107, 0, 0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Plus size={18} color="var(--ridex-orange)" />
                   </div>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: 800 }}>Add My Motorcycle</h3>
+                  <h3 style={{ fontSize: '1.08rem', fontWeight: 800, color: '#FFFFFF' }}>Add My Motorcycle</h3>
                 </div>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.45 }}>
-                  Save your brand, tank size, and mileage specs so RIDEX can calculate tour fuel stops and telemetry.
+                <p style={{ color: 'var(--ridex-muted)', fontSize: '0.82rem', lineHeight: 1.45 }}>
+                  Save your brand, tank capacity, and mileage specs so RIDEX can calculate tour fuel stops and live range telemetry.
                 </p>
               </div>
-              <button className="btn btn-primary" style={{ width: '100%', minHeight: '44px', fontSize: '0.9rem' }}>
+              <button className="btn btn-primary" style={{ width: '100%', minHeight: '40px', fontSize: '0.84rem' }}>
                 <span>Configure Motorcycle</span>
-                <ArrowRight size={16} />
+                <ArrowRight size={15} />
               </button>
             </div>
 
@@ -372,7 +372,7 @@ export const GaragePage: React.FC = () => {
               className="card-elevated card-interactive"
               onClick={handleNoBikeChoice}
               style={{
-                padding: '24px 20px',
+                padding: '20px 18px',
                 textAlign: 'left',
                 border: '1px solid var(--border-subtle)',
                 display: 'flex',
@@ -384,21 +384,21 @@ export const GaragePage: React.FC = () => {
             >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(0, 229, 255, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Compass size={20} color="var(--cyan)" />
+                  <div style={{ width: '34px', height: '34px', borderRadius: '9px', background: 'rgba(0, 229, 255, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Compass size={18} color="var(--ridex-cyan)" />
                   </div>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: 800 }}>I Don't Have a Bike</h3>
+                  <h3 style={{ fontSize: '1.08rem', fontWeight: 800, color: '#FFFFFF' }}>I Don't Have a Bike</h3>
                 </div>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.45 }}>
-                  Join tours as a co-rider, navigator, or pillion. You can explore all rides and add a motorcycle later anytime.
+                <p style={{ color: 'var(--ridex-muted)', fontSize: '0.82rem', lineHeight: 1.45 }}>
+                  Join group tours as a co-rider, navigator, or pillion. You can explore all rides and register a machine anytime.
                 </p>
               </div>
               <button
-                className="btn btn-secondary"
-                style={{ width: '100%', minHeight: '44px', fontSize: '0.9rem', borderColor: 'var(--border-cyan)', color: 'var(--cyan)' }}
+                className="btn btn-tactical"
+                style={{ width: '100%', minHeight: '40px', fontSize: '0.84rem' }}
               >
                 <span>Continue without Bike</span>
-                <ArrowRight size={16} />
+                <ArrowRight size={15} />
               </button>
             </div>
           </div>
@@ -838,25 +838,25 @@ export const GaragePage: React.FC = () => {
       ) : (
         /* Registered Fleet Cards */
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
             {motorcycles.map((bike) => {
               const safeRangeKm = Math.round(bike.fuelTankCapacityL * bike.avgMileageKmpl * 0.9);
 
               return (
                 <div
                   key={bike.id}
-                  className="card-glass"
+                  className="rx-cockpit-panel"
                   style={{
-                    padding: '22px',
+                    padding: '20px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '16px',
-                    border: bike.isPrimary ? '1.5px solid var(--border-active)' : '1px solid var(--border-card)',
+                    gap: '14px',
+                    border: bike.isPrimary ? '1.5px solid rgba(255, 107, 0, 0.45)' : '1px solid var(--ridex-border)',
                     position: 'relative',
                     overflow: 'hidden',
                   }}
                 >
-                  {/* Primary Machine Glow Highlight */}
+                  {/* Primary Machine Top Bevel Indicator */}
                   {bike.isPrimary && (
                     <div
                       style={{
@@ -864,8 +864,8 @@ export const GaragePage: React.FC = () => {
                         top: 0,
                         left: 0,
                         right: 0,
-                        height: '3px',
-                        background: 'linear-gradient(90deg, var(--primary), var(--primary-bright))',
+                        height: '2px',
+                        background: 'linear-gradient(90deg, transparent 0%, var(--ridex-orange) 20%, var(--ridex-orange) 80%, transparent 100%)',
                       }}
                     />
                   )}
@@ -876,130 +876,100 @@ export const GaragePage: React.FC = () => {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                         <span
                           style={{
-                            fontSize: '0.68rem',
+                            fontSize: '0.65rem',
                             fontWeight: 800,
                             letterSpacing: '0.08em',
                             textTransform: 'uppercase',
-                            color: 'var(--cyan)',
+                            color: 'var(--ridex-cyan)',
                             background: 'rgba(0, 229, 255, 0.1)',
-                            padding: '2px 8px',
-                            borderRadius: '4px',
+                            border: '1px solid rgba(0, 229, 255, 0.3)',
+                            padding: '2px 7px',
+                            borderRadius: '5px',
                           }}
                         >
                           {bike.category || 'ADVENTURE'}
                         </span>
                         {bike.registrationNumber && (
-                          <span className="mono" style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--ridex-muted)', fontWeight: 600 }}>
                             {bike.registrationNumber}
                           </span>
                         )}
                       </div>
-                      <h3 style={{ fontSize: '1.25rem', fontWeight: 800, lineHeight: 1.2 }}>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: 850, lineHeight: 1.2, color: '#FFFFFF' }}>
                         {bike.manufacturer} {bike.model}
                       </h3>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                        {bike.year} • {bike.color || 'Dark'}
+                      <div style={{ fontSize: '0.78rem', color: 'var(--ridex-muted)', marginTop: '2px' }}>
+                        {bike.year} • {bike.color || 'Dark'} • Telemetry Enabled
                       </div>
                     </div>
 
-                    {/* Primary Badge or Select Button */}
+                    {/* Primary Badge or Set Active Button */}
                     {bike.isPrimary ? (
                       <span
                         className="badge"
                         style={{
-                          background: 'rgba(255, 107, 0, 0.15)',
-                          color: 'var(--primary)',
+                          background: 'rgba(255, 107, 0, 0.14)',
+                          color: 'var(--ridex-orange)',
                           border: '1px solid rgba(255, 107, 0, 0.4)',
-                          padding: '4px 10px',
-                          fontSize: '0.72rem',
+                          padding: '3px 8px',
+                          fontSize: '0.68rem',
                           fontWeight: 800,
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '4px',
                         }}
                       >
-                        <Star size={12} fill="var(--primary)" />
+                        <Star size={11} fill="var(--ridex-orange)" />
                         <span>PRIMARY</span>
                       </span>
                     ) : (
                       <button
                         onClick={() => setPrimaryMutation.mutate(bike.id)}
                         className="btn btn-secondary"
-                        style={{ minHeight: '30px', padding: '4px 10px', fontSize: '0.75rem', fontWeight: 700 }}
+                        style={{ minHeight: '30px', padding: '3px 9px', fontSize: '0.72rem', fontWeight: 700 }}
                       >
                         Set Active
                       </button>
                     )}
                   </div>
 
-                  {/* Telemetry Metrics Grid */}
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(3, 1fr)',
-                      gap: '8px',
-                      padding: '12px',
-                      background: 'var(--bg-surface)',
-                      borderRadius: '12px',
-                      border: '1px solid var(--border-subtle)',
-                    }}
-                  >
-                    <div>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
-                        Engine
-                      </span>
-                      <span className="mono" style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                        {bike.engineCc || bike.displacementCc} cc
-                      </span>
+                  {/* 4-Box Telemetry Specs Grid */}
+                  <div className="machine-specs-row">
+                    <div className="machine-spec-box">
+                      <div className="machine-spec-label">DISPLACEMENT</div>
+                      <div className="machine-spec-value">
+                        {bike.engineCc || bike.displacementCc || 400} <span style={{ fontSize: '0.7rem', color: 'var(--ridex-muted)' }}>cc</span>
+                      </div>
                     </div>
 
-                    <div>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
-                        Fuel Tank
-                      </span>
-                      <span className="mono" style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--gold)' }}>
-                        {bike.fuelTankCapacityL} L
-                      </span>
+                    <div className="machine-spec-box">
+                      <div className="machine-spec-label">FUEL TANK</div>
+                      <div className="machine-spec-value">
+                        {bike.fuelTankCapacityL} <span style={{ fontSize: '0.7rem', color: 'var(--ridex-muted)' }}>L</span>
+                      </div>
                     </div>
 
-                    <div>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', display: 'block' }}>
-                        Mileage
-                      </span>
-                      <span className="mono" style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--success)' }}>
-                        {bike.avgMileageKmpl} km/l
-                      </span>
+                    <div className="machine-spec-box">
+                      <div className="machine-spec-label">AVG MILEAGE</div>
+                      <div className="machine-spec-value">
+                        {bike.avgMileageKmpl} <span style={{ fontSize: '0.7rem', color: 'var(--ridex-muted)' }}>km/l</span>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Calibrated Safe Range Highlight */}
-                  <div
-                    style={{
-                      background: 'rgba(0, 229, 255, 0.08)',
-                      border: '1px solid rgba(0, 229, 255, 0.22)',
-                      borderRadius: '10px',
-                      padding: '10px 14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      fontSize: '0.82rem',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--cyan)' }}>
-                      <Fuel size={16} />
-                      <span style={{ fontWeight: 600 }}>Safe Touring Range:</span>
+                    <div className="machine-spec-box">
+                      <div className="machine-spec-label">SAFE RANGE</div>
+                      <div className="machine-spec-value" style={{ color: 'var(--ridex-cyan)' }}>
+                        ~{safeRangeKm} <span style={{ fontSize: '0.7rem', color: 'var(--ridex-cyan)' }}>km</span>
+                      </div>
                     </div>
-                    <span className="mono" style={{ fontWeight: 800, color: '#FFFFFF', fontSize: '0.95rem' }}>
-                      ~{safeRangeKm} km
-                    </span>
                   </div>
 
                   {/* Card Action Controls */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
                     <button
                       onClick={() => handleEditClick(bike)}
                       className="btn btn-secondary"
-                      style={{ minHeight: '34px', padding: '4px 12px', fontSize: '0.8rem', gap: '6px' }}
+                      style={{ minHeight: '32px', padding: '4px 12px', fontSize: '0.78rem', gap: '6px' }}
                     >
                       <Edit2 size={13} />
                       <span>Edit Specs</span>
@@ -1012,7 +982,7 @@ export const GaragePage: React.FC = () => {
                         }
                       }}
                       className="btn btn-secondary"
-                      style={{ minHeight: '34px', padding: '4px 10px', fontSize: '0.8rem', color: 'var(--danger)' }}
+                      style={{ minHeight: '32px', padding: '4px 10px', fontSize: '0.78rem', color: 'var(--ridex-danger)' }}
                     >
                       <Trash2 size={13} />
                       <span>Remove</span>

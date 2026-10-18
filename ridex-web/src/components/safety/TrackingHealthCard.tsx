@@ -35,7 +35,7 @@ export const TrackingHealthCard: React.FC<TrackingHealthProps> = ({
   const freshness = safetyService.evaluateLocationFreshness(lastUpdatedIso);
 
   return (
-    <div className="card-glass" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div className="rx-cockpit-panel" style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <ShieldCheck size={18} color={isTracking && !freshness.isStale ? 'var(--success)' : 'var(--primary)'} />

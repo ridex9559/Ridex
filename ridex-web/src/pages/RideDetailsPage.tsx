@@ -222,23 +222,23 @@ export const RideDetailsPage: React.FC = () => {
   const approvedParticipants = participants.filter((p) => p.status === 'approved');
 
   return (
-    <div className="desktop-wrapper" style={{ maxWidth: '820px', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="desktop-wrapper" style={{ maxWidth: '820px', padding: '20px 16px calc(84px + var(--sab))', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Back & Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button
           onClick={() => navigate('/dashboard')}
-          className="btn btn-secondary"
-          style={{ minHeight: '34px', padding: '4px 12px', fontSize: '0.8rem' }}
+          className="rx-btn rx-btn-secondary"
+          style={{ minHeight: '38px', padding: '6px 14px', fontSize: '0.82rem' }}
         >
-          <ArrowLeft size={14} />
+          <ArrowLeft size={15} />
           <span>All Rides</span>
         </button>
 
         {isApprovedParticipant && (
           <button
             onClick={() => navigate(`/rides/live/${ride.id}`)}
-            className={isLive ? "btn btn-cyan" : "btn btn-primary"}
-            style={{ minHeight: '36px', padding: '6px 14px', fontSize: '0.85rem' }}
+            className={isLive ? "rx-btn rx-btn-cyan" : "rx-btn rx-btn-primary"}
+            style={{ minHeight: '38px', padding: '6px 16px', fontSize: '0.85rem' }}
           >
             <Radio size={16} className={isLive ? "pulse-radar" : ""} />
             <span>{isLive ? 'Enter Live Cockpit' : 'Enter Squad Lobby'}</span>

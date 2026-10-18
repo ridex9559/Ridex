@@ -155,11 +155,11 @@ export const HostRidePage: React.FC = () => {
   }
 
   return (
-    <div className="desktop-wrapper" style={{ maxWidth: '780px', padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="desktop-wrapper" style={{ maxWidth: '780px', padding: '24px 16px calc(84px + var(--sab))', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Step Progress Indicator */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '16px' }}>
         <div>
-          <span className="mono" style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 700 }}>
+          <span className="rx-telemetry" style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 700 }}>
             STEP {step} OF 3
           </span>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 800 }}>
@@ -193,7 +193,7 @@ export const HostRidePage: React.FC = () => {
 
       {/* STEP 1: TOUR BASICS */}
       {step === 1 && (
-        <div className="card-glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="rx-cockpit-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
               Tour Title
@@ -222,7 +222,7 @@ export const HostRidePage: React.FC = () => {
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
             <div>
               <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
                 Tour Date
@@ -250,7 +250,7 @@ export const HostRidePage: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
             <div>
               <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
                 Meetup / Briefing Time
@@ -277,7 +277,7 @@ export const HostRidePage: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
             <div>
               <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
                 Difficulty Rating
@@ -335,7 +335,7 @@ export const HostRidePage: React.FC = () => {
       {step === 2 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           {/* Map Preview */}
-          <div className="card-glass" style={{ padding: '16px' }}>
+          <div className="rx-cockpit-panel" style={{ padding: '18px 20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Navigation size={18} color="var(--primary)" />
@@ -345,7 +345,7 @@ export const HostRidePage: React.FC = () => {
                 type="button"
                 onClick={handleRecalculateRoute}
                 className="btn btn-secondary"
-                style={{ minHeight: '32px', padding: '4px 10px', fontSize: '0.75rem' }}
+                style={{ minHeight: '34px', padding: '6px 12px', fontSize: '0.75rem' }}
               >
                 Refresh Road Polyline
               </button>
@@ -361,7 +361,7 @@ export const HostRidePage: React.FC = () => {
           </div>
 
           {/* Endpoints Inputs */}
-          <div className="card-glass" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div className="rx-cockpit-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <h4 style={{ fontSize: '1rem', fontWeight: 700 }}>Route Endpoints</h4>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -428,7 +428,7 @@ export const HostRidePage: React.FC = () => {
           </div>
 
           {/* Intermediate Waypoints Editor */}
-          <div className="card-glass" style={{ padding: '20px' }}>
+          <div className="rx-cockpit-panel" style={{ padding: '20px' }}>
             <WaypointEditor
               waypoints={waypoints}
               onChange={(updated) => {
@@ -464,7 +464,7 @@ export const HostRidePage: React.FC = () => {
 
       {/* STEP 3: REVIEW & CONFIRM */}
       {step === 3 && (
-        <div className="card-glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="rx-cockpit-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '14px' }}>
             <span className="badge badge-upcoming">TOUR SUMMARY</span>
             <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginTop: '6px' }}>{title}</h3>
@@ -490,42 +490,42 @@ export const HostRidePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Telemetry Metrics Grid */}
+          {/* Telemetry Metrics Grid (Responsive Auto-Fit) */}
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
               gap: '10px',
               padding: '14px',
-              background: 'var(--bg-surface)',
+              background: 'rgba(10, 14, 20, 0.8)',
+              border: '1px solid rgba(255, 255, 255, 0.06)',
               borderRadius: '12px',
-              fontSize: '0.8rem',
             }}
           >
             <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block' }}>Estimated Road</span>
-              <span className="mono" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>
+              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Estimated Road</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)' }}>
                 ~{calculatedDistanceKm} km
               </span>
             </div>
             <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block' }}>Departure</span>
-              <span style={{ fontSize: '1rem', fontWeight: 700, color: '#FFF' }}>{departureTime}</span>
+              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Departure</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1rem', fontWeight: 700, color: '#FFF' }}>{departureTime}</span>
             </div>
             <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block' }}>Date</span>
-              <span style={{ fontSize: '0.95rem', fontWeight: 600, color: '#FFF' }}>{rideDate}</span>
+              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Date</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95rem', fontWeight: 600, color: '#FFF' }}>{rideDate}</span>
             </div>
             <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block' }}>Stops</span>
-              <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--cyan)' }}>{waypoints.length}</span>
+              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Stops</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--cyan)' }}>{waypoints.length}</span>
             </div>
           </div>
 
           <div
             style={{
-              background: 'rgba(0, 229, 255, 0.1)',
-              border: '1px solid var(--border-cyan)',
+              background: 'rgba(0, 229, 255, 0.08)',
+              border: '1px solid rgba(0, 229, 255, 0.25)',
               borderRadius: '10px',
               padding: '12px 14px',
               fontSize: '0.85rem',

@@ -82,25 +82,25 @@ export const SafetyCenterPage: React.FC = () => {
   const isHost = ride?.organizerId === user?.id;
 
   return (
-    <div className="desktop-wrapper" style={{ padding: '20px 16px 80px', display: 'flex', flexDirection: 'column', gap: '18px', maxWidth: '780px' }}>
+    <div className="desktop-wrapper" style={{ padding: '20px 16px calc(84px + var(--sab))', display: 'flex', flexDirection: 'column', gap: '18px', maxWidth: '780px' }}>
       {/* Top Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <button
           onClick={() => (rideId ? navigate(`/rides/live/${rideId}`) : navigate('/dashboard'))}
           className="btn btn-secondary"
-          style={{ minHeight: '36px', padding: '6px 14px', fontSize: '0.82rem' }}
+          style={{ minHeight: '40px', padding: '8px 16px', fontSize: '0.82rem' }}
         >
-          <ArrowLeft size={15} />
+          <ArrowLeft size={16} />
           <span>{rideId ? 'Back to Live Radar' : 'Back to Dashboard'}</span>
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="badge" style={{ background: 'rgba(255, 59, 48, 0.15)', color: 'var(--danger)', border: '1px solid var(--danger-glow)' }}>
+          <span className="rx-badge rx-badge-danger">
             <ShieldAlert size={12} />
             <span>SAFETY CENTER</span>
           </span>
           {ride?.joinCode && (
-            <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--cyan)', fontWeight: 700 }}>
+            <span className="rx-telemetry" style={{ fontSize: '0.82rem', color: 'var(--cyan)', fontWeight: 700 }}>
               {ride.joinCode}
             </span>
           )}
@@ -119,11 +119,11 @@ export const SafetyCenterPage: React.FC = () => {
       {activeSos && (
         <div
           style={{
-            background: 'linear-gradient(135deg, rgba(255, 59, 48, 0.25) 0%, rgba(18, 23, 34, 0.95) 100%)',
-            border: '2px solid var(--danger)',
+            background: 'linear-gradient(135deg, rgba(255, 59, 48, 0.2) 0%, rgba(18, 23, 34, 0.98) 100%)',
+            border: '1.5px solid var(--danger)',
             borderRadius: '16px',
             padding: '18px',
-            boxShadow: '0 0 30px rgba(255, 59, 48, 0.35)',
+            boxShadow: '0 8px 32px rgba(255, 59, 48, 0.25)',
             display: 'flex',
             flexDirection: 'column',
             gap: '12px',
@@ -146,13 +146,13 @@ export const SafetyCenterPage: React.FC = () => {
           </div>
 
           {activeSos.note && (
-            <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '8px 12px', borderRadius: '8px', fontSize: '0.8rem', color: '#FFFFFF' }}>
+            <div style={{ background: 'rgba(0, 0, 0, 0.4)', border: '1px solid rgba(255, 59, 48, 0.2)', padding: '8px 12px', borderRadius: '8px', fontSize: '0.8rem', color: '#FFFFFF' }}>
               "{activeSos.note}"
             </div>
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '0.74rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
               GPS: {activeSos.latitude.toFixed(5)}, {activeSos.longitude.toFixed(5)} • Reported {new Date(activeSos.createdAt).toLocaleTimeString()}
             </span>
 
@@ -161,7 +161,7 @@ export const SafetyCenterPage: React.FC = () => {
                 onClick={() => resolveMutation.mutate(activeSos.id)}
                 disabled={resolveMutation.isPending}
                 className="btn btn-secondary"
-                style={{ minHeight: '34px', padding: '4px 14px', fontSize: '0.78rem', borderColor: 'var(--success)', color: 'var(--success)' }}
+                style={{ minHeight: '36px', padding: '6px 14px', fontSize: '0.78rem', borderColor: 'var(--success)', color: 'var(--success)' }}
               >
                 <CheckCircle2 size={14} />
                 <span>Mark Alert as Resolved</span>
@@ -175,26 +175,13 @@ export const SafetyCenterPage: React.FC = () => {
       <SeparationBanner state={separationState} />
 
       {/* Emergency Assistance SOS Action Button */}
-      <div
-        className="card-glass"
-        style={{
-          padding: '20px',
-          borderRadius: '16px',
-          border: '1px solid var(--border-card)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '16px',
-          background: 'linear-gradient(135deg, rgba(255, 59, 48, 0.1) 0%, rgba(18, 23, 34, 0.95) 100%)',
-        }}
-      >
+      <div className="safety-beacon-card">
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <AlertTriangle size={20} color="var(--danger)" />
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 800 }}>Need Squad Assistance?</h3>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#FFFFFF' }}>Need Squad Assistance?</h3>
           </div>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '4px', maxWidth: '420px' }}>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '4px', maxWidth: '440px', lineHeight: 1.45 }}>
             Broadcast an emergency distress beacon to all riders in this tour. Select from Mechanical, Flat Tyre, Fuel, Lost, or Medical.
           </p>
         </div>
@@ -202,14 +189,15 @@ export const SafetyCenterPage: React.FC = () => {
         <button
           onClick={() => setShowSosModal(true)}
           className="btn btn-danger"
-          style={{ minHeight: '46px', padding: '10px 22px', fontSize: '0.95rem', fontWeight: 800 }}
+          style={{ minHeight: '46px', padding: '10px 22px', fontSize: '0.88rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}
         >
-          🚨 TRIGGER SOS BEACON
+          <Radio size={16} className="blink-beacon" />
+          <span>TRIGGER SOS BEACON</span>
         </button>
       </div>
 
       {/* 2-Column Grid: GPS Health & Intercom */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
         {/* GPS Health Component */}
         <TrackingHealthCard
           isTracking={isTracking}
@@ -228,29 +216,29 @@ export const SafetyCenterPage: React.FC = () => {
 
       {/* National Emergency Services Quick Tile */}
       <div
-        className="card-glass"
-        style={{ padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}
+        className="rx-cockpit-panel"
+        style={{ padding: '18px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}
       >
         <div>
-          <h4 style={{ fontSize: '0.92rem', fontWeight: 700 }}>Direct Emergency Services</h4>
+          <h4 style={{ fontSize: '0.92rem', fontWeight: 700, color: '#FFFFFF' }}>Direct Emergency Services</h4>
           <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
             If immediate ambulance, highway patrol, or fire rescue is needed:
           </span>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <a
             href="tel:112"
-            className="btn btn-secondary"
-            style={{ minHeight: '36px', padding: '6px 14px', fontSize: '0.8rem', textDecoration: 'none', color: '#FFFFFF' }}
+            className="btn btn-tactical"
+            style={{ minHeight: '38px', padding: '6px 14px', fontSize: '0.8rem', textDecoration: 'none', color: '#FFFFFF' }}
           >
             <PhoneCall size={14} color="var(--cyan)" />
             <span>Dial 112 (National Emergency)</span>
           </a>
           <a
             href="tel:108"
-            className="btn btn-secondary"
-            style={{ minHeight: '36px', padding: '6px 14px', fontSize: '0.8rem', textDecoration: 'none', color: '#FFFFFF' }}
+            className="btn btn-tactical"
+            style={{ minHeight: '38px', padding: '6px 14px', fontSize: '0.8rem', textDecoration: 'none', color: '#FFFFFF' }}
           >
             <HeartPulse size={14} color="var(--danger)" />
             <span>108 (Ambulance)</span>
@@ -259,32 +247,26 @@ export const SafetyCenterPage: React.FC = () => {
       </div>
 
       {/* Emergency History for this tour */}
-      <div className="card-glass" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <h4 style={{ fontSize: '0.95rem', fontWeight: 700 }}>Tour Emergency Event Log</h4>
+      <div className="rx-cockpit-panel" style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF' }}>Tour Emergency Event Log</h4>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+            {pastAlerts.length} INCIDENTS
+          </span>
+        </div>
         {pastAlerts.length === 0 ? (
-          <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+          <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem', background: 'rgba(255, 255, 255, 0.01)', borderRadius: '10px' }}>
             No past emergency alerts recorded on this expedition. Squad is safe.
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {pastAlerts.map((alert) => (
-              <div
-                key={alert.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px 12px',
-                  borderRadius: '10px',
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid var(--border-subtle)',
-                }}
-              >
+              <div key={alert.id} className="safety-incident-item">
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#FFFFFF' }}>
                     {alert.issueType.replace('_', ' ')} • {alert.riderName}
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
                     {new Date(alert.createdAt).toLocaleString()} • {alert.note || 'No note attached'}
                   </div>
                 </div>
@@ -295,8 +277,11 @@ export const SafetyCenterPage: React.FC = () => {
                     fontWeight: 700,
                     padding: '2px 8px',
                     borderRadius: '4px',
+                    fontFamily: 'var(--font-heading)',
+                    letterSpacing: '0.04em',
                     background: alert.status === 'RESOLVED' ? 'rgba(0, 230, 118, 0.15)' : 'rgba(255, 59, 48, 0.15)',
                     color: alert.status === 'RESOLVED' ? 'var(--success)' : 'var(--danger)',
+                    border: `1px solid ${alert.status === 'RESOLVED' ? 'rgba(0, 230, 118, 0.3)' : 'rgba(255, 59, 48, 0.3)'}`,
                   }}
                 >
                   {alert.status}

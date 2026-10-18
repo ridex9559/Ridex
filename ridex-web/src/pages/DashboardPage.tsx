@@ -110,6 +110,10 @@ export const DashboardPage: React.FC = () => {
     return rides.find((r) => r.status === 'active') || null;
   }, [rides, activeRideId]);
 
+  const hasActiveRide = useMemo(() => {
+    return !!((isTracking && activeRideId) || (activeRide && activeRide.status === 'active'));
+  }, [isTracking, activeRideId, activeRide]);
+
   const mapStartCoord = useMemo(() => {
     if (activeRide) {
       return { latitude: activeRide.startLatitude, longitude: activeRide.startLongitude, name: activeRide.startLocationName };
@@ -173,482 +177,301 @@ export const DashboardPage: React.FC = () => {
         {/* COLUMN 2: CENTRAL COMMAND AREA (Fluid)                            */}
         {/* ================================================================= */}
         <main className="ridex-central-content">
-          {/* 1. WELCOME HERO HEADER */}
-          <div className="hero-header-card">
+          {/* 1. CINEMATIC EXPEDITION HERO */}
+          <div className="cockpit-hero">
             <img
               src="/hero-adventure.jpg"
               alt="RIDEX Motorcycle Adventure Sunset"
-              className="hero-backdrop-img"
+              className="cockpit-hero-bg"
               onError={(e) => {
                 // Graceful fallback to dark gradient if image fails
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
-            <div className="hero-gradient-overlay" />
+            <div className="cockpit-hero-vignette" />
 
-            <div className="hero-content">
+            <div className="cockpit-hero-content">
               <div>
-                <h1 className="hero-title">
-                  Welcome back, {user?.fullName || 'Rider'} 👋
+                <div className="cockpit-badge-radar">
+                  <span className="cockpit-dot-pulse" />
+                  <span>
+                    {typeof navigator !== 'undefined' && !navigator.onLine
+                      ? 'OFFLINE • CACHED TELEMETRY'
+                      : isLoadingRides
+                      ? 'SYNCING SQUAD TELEMETRY...'
+                      : isTracking && activeRideId
+                      ? 'TELEMETRY ACTIVE • LIVE COCKPIT LINKED'
+                      : 'GPS READY • COCKPIT STANDBY'}
+                  </span>
+                </div>
+                <h1 className="cockpit-hero-title">
+                  {user?.fullName ? `WELCOME, ${user.fullName.toUpperCase()}` : 'EXPEDITION COCKPIT'}
                 </h1>
-                <p className="hero-subtitle">
-                  Ready for your next ride? Discover squad tours or track live on radar.
+                <p className="cockpit-hero-subtitle">
+                  Rider-first group navigation, precision telemetry, and squad radar tracking across every mile.
                 </p>
               </div>
 
-              {/* Top Right Quick Controls */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              {/* Thumb-friendly Launch Grid */}
+              <div className="cockpit-launch-grid">
                 {isTracking && activeRideId ? (
                   <button
                     onClick={() => navigate(`/rides/live/${activeRideId}`)}
-                    className="badge badge-live card-interactive"
-                    style={{ padding: '8px 14px', fontSize: '0.82rem', border: 'none' }}
+                    className="cockpit-btn-launch-primary"
+                    style={{ background: 'linear-gradient(135deg, #00F0FF 0%, #0099FF 100%)', color: '#07080B' }}
                   >
-                    <Radio size={14} className="pulse-radar" />
-                    <span>RADAR ACTIVE</span>
+                    <Radio size={18} className="pulse-radar" />
+                    <span>RESUME LIVE COCKPIT</span>
                   </button>
                 ) : (
                   <button
-                    onClick={() => navigate('/connect')}
-                    className="btn btn-secondary"
-                    style={{ minHeight: '38px', padding: '6px 14px', fontSize: '0.84rem' }}
+                    onClick={() => navigate('/host')}
+                    className="cockpit-btn-launch-primary"
                   >
-                    <QrCode size={15} color="var(--cyan)" />
-                    <span>Join with Code</span>
+                    <Plus size={18} />
+                    <span>HOST EXPEDITION</span>
                   </button>
                 )}
 
                 <button
-                  onClick={() => navigate('/host')}
-                  className="btn btn-primary"
-                  style={{ minHeight: '38px', padding: '6px 16px', fontSize: '0.84rem' }}
+                  onClick={() => navigate('/connect')}
+                  className="cockpit-btn-launch-tactical"
                 >
-                  <Plus size={15} />
-                  <span>Host Ride</span>
+                  <QrCode size={18} color="var(--cyan)" />
+                  <span>JOIN WITH PIN</span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* 2. SUMMARY METRIC CARDS (4 Compact Tiles) */}
-          <section className="metric-cards-grid">
-            {/* Card 1: Total Rides */}
-            <div
-              className="metric-card card-interactive"
-              onClick={() => {
-                setFilter('joined');
-                setSearchParams({ tab: 'joined' });
-              }}
-              title="Filter to my rides"
-            >
-              <div
-                className="metric-icon-box"
-                style={{ background: 'rgba(255, 107, 0, 0.15)', color: 'var(--primary)' }}
-              >
-                <Compass size={20} />
-              </div>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div className="metric-value">{userRidesCount}</div>
-                <div className="metric-label">Total Rides</div>
-              </div>
-              <ArrowUpRight size={14} color="var(--text-muted)" style={{ opacity: 0.6 }} />
+          {/* 2. UNIFIED COCKPIT INSTRUMENT PANEL (MULTI-GAUGE BAR) */}
+          <section className="cockpit-instrument-panel">
+            <div className="instrument-panel-header">
+              <span className="instrument-panel-title">EXPEDITION TELEMETRY CLUSTER</span>
+              <span className="instrument-panel-status">REALTIME METRICS</span>
             </div>
-
-            {/* Card 2: Total Distance */}
-            <div className="metric-card">
+            <div className="instrument-gauges-grid">
+              {/* Gauge 1: Total Rides */}
               <div
-                className="metric-icon-box"
-                style={{ background: 'rgba(0, 229, 255, 0.15)', color: 'var(--cyan)' }}
+                className="gauge-cell"
+                onClick={() => {
+                  setFilter('joined');
+                  setSearchParams({ tab: 'joined' });
+                }}
+                style={{ cursor: 'pointer' }}
+                title="Filter to my rides"
               >
-                <Navigation size={20} />
-              </div>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div className="metric-value">
-                  {totalDistanceKm > 0 ? `${totalDistanceKm.toLocaleString()}` : '0'}
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--cyan)', marginLeft: '3px' }}>km</span>
+                <div className="gauge-cell-label">EXPEDITIONS</div>
+                <div className="gauge-cell-value">
+                  {userRidesCount}
                 </div>
-                <div className="metric-label">Total Distance</div>
+                <div className="gauge-cell-sub">
+                  <span style={{ color: 'var(--primary)' }}>●</span> Logged Tours
+                </div>
               </div>
-            </div>
 
-            {/* Card 3: Riding Buddies */}
-            <div className="metric-card">
-              <div
-                className="metric-icon-box"
-                style={{ background: 'rgba(0, 230, 118, 0.15)', color: 'var(--success)' }}
-              >
-                <Users size={20} />
+              {/* Gauge 2: Total Distance */}
+              <div className="gauge-cell">
+                <div className="gauge-cell-label">TOTAL DISTANCE</div>
+                <div className="gauge-cell-value" style={{ color: 'var(--cyan)' }}>
+                  {totalDistanceKm > 0 ? totalDistanceKm.toLocaleString() : '0'}
+                  <span style={{ fontSize: '0.9rem', marginLeft: '4px', color: 'var(--text-muted)' }}>KM</span>
+                </div>
+                <div className="gauge-cell-sub">
+                  OSRM Verified
+                </div>
               </div>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div className="metric-value">{ridingBuddiesCount}</div>
-                <div className="metric-label">Riding Buddies</div>
-              </div>
-            </div>
 
-            {/* Card 4: Milestones / Memories */}
-            <div className="metric-card">
-              <div
-                className="metric-icon-box"
-                style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#A855F7' }}
-              >
-                <Sparkles size={20} />
+              {/* Gauge 3: Riding Buddies */}
+              <div className="gauge-cell">
+                <div className="gauge-cell-label">SQUAD RIDERS</div>
+                <div className="gauge-cell-value" style={{ color: 'var(--success)' }}>
+                  {ridingBuddiesCount}
+                </div>
+                <div className="gauge-cell-sub">
+                  In Network
+                </div>
               </div>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div className="metric-value">
+
+              {/* Gauge 4: Milestones / Memories */}
+              <div className="gauge-cell">
+                <div className="gauge-cell-label">PASSPORT BADGES</div>
+                <div className="gauge-cell-value" style={{ color: '#C084FC' }}>
                   {completedMilestonesCount > 0 ? completedMilestonesCount : (rides.length > 0 ? rides.length : '0')}
                 </div>
-                <div className="metric-label">Tour Milestones</div>
+                <div className="gauge-cell-sub">
+                  Tour Milestones
+                </div>
               </div>
             </div>
           </section>
 
-          {/* 3. MOTORCYCLE GARAGE CARD (With No-Bike Explorer Mode) */}
-          <section className="garage-dashboard-card">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Bike size={20} color="var(--primary)" />
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 700 }}>My Motorcycle</h3>
-              </div>
-              <button
-                onClick={() => navigate('/garage')}
-                className="rail-link-btn"
-                style={{ fontSize: '0.8rem' }}
-              >
-                <span>View Garage</span>
-                <ArrowRight size={14} />
-              </button>
-            </div>
-
-            {primaryBike ? (
-              /* Rider has a saved motorcycle */
-              <div>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: '12px',
-                    marginBottom: '14px',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <img
-                      src={primaryBike.imageUrl}
-                      alt={`${primaryBike.manufacturer} ${primaryBike.model}`}
-                      style={{
-                        width: '64px',
-                        height: '46px',
-                        objectFit: 'cover',
-                        borderRadius: '10px',
-                        border: '1px solid var(--border-subtle)',
-                        background: 'rgba(0,0,0,0.4)',
-                      }}
-                    />
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.15rem' }}>
-                          {primaryBike.manufacturer} {primaryBike.model}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: '0.65rem',
-                            padding: '2px 8px',
-                            borderRadius: '9999px',
-                            background: 'rgba(255, 107, 0, 0.15)',
-                            color: 'var(--primary)',
-                            fontWeight: 700,
-                            border: '1px solid var(--border-active)',
-                          }}
-                        >
-                          PRIMARY FLEET
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                        {primaryBike.year} Model • {primaryBike.color} • Registered with Telemetry
-                      </div>
+          {/* 3. MOTORCYCLE TELEMETRY SHOWCASE (OR EXPLORER PASS) */}
+          {primaryBike ? (
+            <section className="machine-showcase-card">
+              <div className="machine-showcase-header">
+                <div className="machine-showcase-info">
+                  <img
+                    src={primaryBike.imageUrl}
+                    alt={`${primaryBike.manufacturer} ${primaryBike.model}`}
+                    className="machine-thumb-img"
+                  />
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <span className="machine-name-heading">
+                        {primaryBike.manufacturer} {primaryBike.model}
+                      </span>
+                      <span className="machine-fleet-badge">
+                        PRIMARY FLEET
+                      </span>
+                    </div>
+                    <div className="machine-sub-text">
+                      {primaryBike.year} Model • {primaryBike.color} • Live Telemetry Enabled
                     </div>
                   </div>
+                </div>
 
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <button
                     onClick={() => navigate('/garage')}
-                    className="btn btn-secondary"
-                    style={{ minHeight: '34px', padding: '4px 12px', fontSize: '0.8rem' }}
+                    className="cockpit-btn-launch-tactical"
+                    style={{ padding: '8px 16px', fontSize: '0.78rem' }}
                   >
-                    Edit Machine
+                    <span>OPEN GARAGE</span>
+                    <ArrowRight size={14} />
                   </button>
                 </div>
+              </div>
 
-                {/* Telemetry Specs Grid */}
-                <div className="garage-specs-grid">
-                  <div className="spec-tile">
-                    <div className="spec-tile-label">Displacement</div>
-                    <div className="spec-tile-value">
-                      {primaryBike.engineCc || primaryBike.displacementCc || 400} cc
-                    </div>
+              {/* 4-Box Telemetry Specs Row */}
+              <div className="machine-specs-row">
+                <div className="machine-spec-box">
+                  <div className="machine-spec-label">DISPLACEMENT</div>
+                  <div className="machine-spec-value">
+                    {primaryBike.engineCc || primaryBike.displacementCc || 400} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>cc</span>
                   </div>
-                  <div className="spec-tile">
-                    <div className="spec-tile-label">Fuel Tank</div>
-                    <div className="spec-tile-value">
-                      {primaryBike.fuelTankCapacityL || 15} L
-                    </div>
+                </div>
+                <div className="machine-spec-box">
+                  <div className="machine-spec-label">FUEL CAPACITY</div>
+                  <div className="machine-spec-value">
+                    {primaryBike.fuelTankCapacityL || 15} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>L</span>
                   </div>
-                  <div className="spec-tile">
-                    <div className="spec-tile-label">Avg Mileage</div>
-                    <div className="spec-tile-value">
-                      {primaryBike.avgMileageKmpl || 28} km/l
-                    </div>
+                </div>
+                <div className="machine-spec-box">
+                  <div className="machine-spec-label">AVG MILEAGE</div>
+                  <div className="machine-spec-value">
+                    {primaryBike.avgMileageKmpl || 28} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>km/l</span>
                   </div>
-                  <div className="spec-tile">
-                    <div className="spec-tile-label">Estimated Range</div>
-                    <div className="spec-tile-value" style={{ color: 'var(--cyan)' }}>
-                      ~{Math.round((primaryBike.fuelTankCapacityL || 15) * (primaryBike.avgMileageKmpl || 28))} km
-                    </div>
+                </div>
+                <div className="machine-spec-box">
+                  <div className="machine-spec-label">ESTIMATED RANGE</div>
+                  <div className="machine-spec-value" style={{ color: 'var(--cyan)' }}>
+                    ~{Math.round((primaryBike.fuelTankCapacityL || 15) * (primaryBike.avgMileageKmpl || 28))} <span style={{ fontSize: '0.75rem', color: 'var(--cyan)' }}>km</span>
                   </div>
                 </div>
               </div>
-            ) : (
-              /* Rider selected "I don't have a bike" or has not added one */
-              <div
-                style={{
-                  padding: '20px',
-                  borderRadius: '12px',
-                  background: 'rgba(255, 107, 0, 0.05)',
-                  border: '1px dashed rgba(255, 107, 0, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  flexWrap: 'wrap',
-                  gap: '16px',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', background: 'rgba(0, 229, 255, 0.15)', color: 'var(--cyan)', fontWeight: 700 }}>
-                      EXPLORER PASS ACTIVE
+            </section>
+          ) : (
+            <div className="explorer-pass-banner">
+              <div>
+                <div className="explorer-badge">
+                  EXPLORER MODE ACTIVE
+                </div>
+                <h4 className="explorer-title">
+                  Zero Vehicle Restrictions. Pure Touring Freedom.
+                </h4>
+                <p className="explorer-desc">
+                  You are registered under Rider Explorer Mode. Host tours, join squads with a Ride ID, or register your motorcycle to track fuel range and machine telemetry.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => navigate('/garage?add=true')}
+                  className="cockpit-btn-launch-primary"
+                  style={{ padding: '8px 18px', fontSize: '0.82rem' }}
+                >
+                  <Plus size={15} />
+                  <span>REGISTER MACHINE</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setFilter('all');
+                    setSearchParams({ tab: 'all' });
+                  }}
+                  className="cockpit-btn-launch-tactical"
+                  style={{ padding: '8px 16px', fontSize: '0.82rem' }}
+                >
+                  <span>EXPLORE EXPEDITIONS</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 4. LIVE RIDE RADAR MAP PANEL (Displayed When Active-Ride Data Exists) */}
+          {hasActiveRide && (
+            <section className="live-map-card rx-card">
+              <div className="live-map-header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Navigation size={18} color="var(--primary)" />
+                  <div>
+                    <h3 style={{ fontSize: '0.98rem', fontWeight: 700 }}>Live Ride Radar</h3>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      {activeRide ? activeRide.title : 'Live Group Expedition'}
                     </span>
                   </div>
-                  <h4 style={{ fontSize: '1.05rem', fontWeight: 800, marginTop: '6px' }}>
-                    Your next adventure starts here.
-                  </h4>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '2px', maxWidth: '480px' }}>
-                    You are riding in Explorer Mode. You can host group tours, join squads with a Ride ID, or register your motorcycle whenever you're ready.
-                  </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button
-                    onClick={() => navigate('/garage?add=true')}
-                    className="btn btn-primary"
-                    style={{ minHeight: '38px', padding: '6px 14px', fontSize: '0.84rem' }}
-                  >
-                    <Plus size={15} />
-                    <span>Add Motorcycle</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setFilter('all');
-                      setSearchParams({ tab: 'all' });
-                    }}
-                    className="btn btn-secondary"
-                    style={{ minHeight: '38px', padding: '6px 14px', fontSize: '0.84rem' }}
-                  >
-                    Explore Rides
-                  </button>
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* 4. LIVE RIDE MAP PANEL (OpenStreetMap Dark Mode, Zero Watermark) */}
-          <section className="live-map-card">
-            <div className="live-map-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Navigation size={18} color="var(--primary)" />
-                <div>
-                  <h3 style={{ fontSize: '0.98rem', fontWeight: 700 }}>Live Ride Radar</h3>
-                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                    {activeRide ? activeRide.title : 'Standby Tactical Map'}
-                  </span>
-                </div>
-              </div>
-
-              {isTracking && activeRideId ? (
-                <span className="badge badge-live">
+                <span className="rx-badge rx-badge-cyan">
                   <Radio size={12} className="pulse-radar" />
                   <span>RADAR ACTIVE</span>
                 </span>
-              ) : (
-                <span
-                  className="badge"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    color: 'var(--text-muted)',
-                    border: '1px solid var(--border-subtle)',
-                  }}
-                >
-                  <Radio size={12} />
-                  <span>RADAR STANDBY</span>
-                </span>
-              )}
-            </div>
+              </div>
 
-            {/* Map Container */}
-            <div style={{ height: '320px', width: '100%', position: 'relative' }}>
-              <LeafletMap
-                start={mapStartCoord}
-                destination={mapDestCoord}
-                riderLocations={activeRiderLocations}
-                currentUserId={user?.id}
-                height="320px"
-                interactive={true}
-              />
-            </div>
+              {/* Map Container */}
+              <div style={{ height: '320px', width: '100%', position: 'relative' }}>
+                <LeafletMap
+                  start={mapStartCoord}
+                  destination={mapDestCoord}
+                  riderLocations={activeRiderLocations}
+                  currentUserId={user?.id}
+                  height="320px"
+                  interactive={true}
+                />
+              </div>
 
-            {/* Map Telemetry Footer */}
-            <div className="live-map-footer">
-              {isTracking && activeRideId ? (
-                <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div>
-                      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                        Speed
-                      </span>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.95rem', color: 'var(--cyan)' }}>
-                        {myLocation?.speedKmh ? `${Math.round(myLocation.speedKmh)} km/h` : '0 km/h'}
-                      </div>
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                        Squad on Radar
-                      </span>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.95rem', color: 'var(--primary)' }}>
-                        {activeRiderLocations.length} Riders
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => navigate(`/rides/live/${activeRideId}`)}
-                    className="btn btn-primary"
-                    style={{ minHeight: '34px', padding: '4px 14px', fontSize: '0.8rem' }}
-                  >
-                    <span>Full Live Cockpit</span>
-                    <ArrowRight size={14} />
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--cyan)', display: 'inline-block' }} />
-                    <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                      Standby Mode — No active ride in progress. Host a tour or join with code to activate radar.
+              {/* Map Telemetry Footer */}
+              <div className="live-map-footer">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                      Speed
                     </span>
+                    <div className="rx-telemetry" style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--cyan)' }}>
+                      {myLocation?.speedKmh ? `${Math.round(myLocation.speedKmh)} km/h` : '0 km/h'}
+                    </div>
                   </div>
-
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button
-                      onClick={() => navigate('/connect')}
-                      className="btn btn-secondary"
-                      style={{ minHeight: '32px', padding: '4px 12px', fontSize: '0.78rem' }}
-                    >
-                      Connect Ride
-                    </button>
-                    <button
-                      onClick={() => navigate('/host')}
-                      className="btn btn-primary"
-                      style={{ minHeight: '32px', padding: '4px 12px', fontSize: '0.78rem' }}
-                    >
-                      Host Ride
-                    </button>
+                  <div>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                      Squad on Radar
+                    </span>
+                    <div className="rx-telemetry" style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--primary)' }}>
+                      {activeRiderLocations.length} Riders
+                    </div>
                   </div>
-                </>
-              )}
-            </div>
-          </section>
+                </div>
 
-          {/* 5. QUICK ACTIONS (4 Prominent Cards) */}
-          <section>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '12px' }}>
-              Quick Actions
-            </h3>
-            <div className="quick-actions-grid">
-              {/* Action 1: Host Ride */}
-              <div
-                onClick={() => navigate('/host')}
-                className="quick-action-card card-interactive"
-              >
-                <div
-                  className="action-icon-tile"
-                  style={{ background: 'rgba(255, 107, 0, 0.15)', color: 'var(--primary)' }}
+                <button
+                  onClick={() => navigate(`/rides/live/${activeRideId || activeRide?.id}`)}
+                  className="rx-btn rx-btn-primary"
+                  style={{ minHeight: '38px', padding: '6px 16px', fontSize: '0.84rem' }}
                 >
-                  <Plus size={18} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="action-title">Host Ride</div>
-                  <div className="action-subtitle">Create a new tour</div>
-                </div>
-                <ArrowRight size={14} color="var(--text-muted)" />
+                  <span>Full Live Cockpit</span>
+                  <ArrowRight size={14} />
+                </button>
               </div>
-
-              {/* Action 2: Connect Ride */}
-              <div
-                onClick={() => navigate('/connect')}
-                className="quick-action-card card-interactive"
-              >
-                <div
-                  className="action-icon-tile"
-                  style={{ background: 'rgba(0, 229, 255, 0.15)', color: 'var(--cyan)' }}
-                >
-                  <QrCode size={18} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="action-title">Connect Ride</div>
-                  <div className="action-subtitle">Join with Ride ID</div>
-                </div>
-                <ArrowRight size={14} color="var(--text-muted)" />
-              </div>
-
-              {/* Action 3: Plan Route */}
-              <div
-                onClick={() => navigate('/host')}
-                className="quick-action-card card-interactive"
-              >
-                <div
-                  className="action-icon-tile"
-                  style={{ background: 'rgba(0, 230, 118, 0.15)', color: 'var(--success)' }}
-                >
-                  <MapPin size={18} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="action-title">Plan Route</div>
-                  <div className="action-subtitle">Waypoints & stops</div>
-                </div>
-                <ArrowRight size={14} color="var(--text-muted)" />
-              </div>
-
-              {/* Action 4: View Community */}
-              <div
-                onClick={() => {
-                  setFilter('all');
-                  setSearchParams({ tab: 'community' });
-                }}
-                className="quick-action-card card-interactive"
-              >
-                <div
-                  className="action-icon-tile"
-                  style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#A855F7' }}
-                >
-                  <Users size={18} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="action-title">View Community</div>
-                  <div className="action-subtitle">Discover riders</div>
-                </div>
-                <ArrowRight size={14} color="var(--text-muted)" />
-              </div>
-            </div>
-          </section>
+            </section>
+          )}
 
           {/* 6. RECENT RIDES / EXPEDITION DIRECTORY */}
           <section style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -660,43 +483,24 @@ export const DashboardPage: React.FC = () => {
                 </span>
               </div>
 
-              {/* Filter Tabs */}
-              <div style={{ display: 'flex', gap: '6px', background: 'rgba(18, 23, 34, 0.8)', padding: '3px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+              {/* Cockpit Segmented Filter Tabs */}
+              <div className="cockpit-segmented-bar">
                 <button
                   onClick={() => {
                     setFilter('all');
                     setSearchParams({});
                   }}
-                  style={{
-                    padding: '5px 12px',
-                    borderRadius: '8px',
-                    fontSize: '0.78rem',
-                    fontFamily: 'var(--font-heading)',
-                    fontWeight: filter === 'all' ? 700 : 500,
-                    border: 'none',
-                    background: filter === 'all' ? 'var(--primary)' : 'transparent',
-                    color: filter === 'all' ? '#FFFFFF' : 'var(--text-muted)',
-                    cursor: 'pointer',
-                  }}
+                  className={`cockpit-segment-btn ${filter === 'all' ? 'active' : ''}`}
                 >
-                  All ({rides.length})
+                  <span>All Tours</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', opacity: 0.85 }}>({rides.length})</span>
                 </button>
                 <button
                   onClick={() => {
                     setFilter('hosted');
                     setSearchParams({ tab: 'hosted' });
                   }}
-                  style={{
-                    padding: '5px 12px',
-                    borderRadius: '8px',
-                    fontSize: '0.78rem',
-                    fontFamily: 'var(--font-heading)',
-                    fontWeight: filter === 'hosted' ? 700 : 500,
-                    border: 'none',
-                    background: filter === 'hosted' ? 'var(--primary)' : 'transparent',
-                    color: filter === 'hosted' ? '#FFFFFF' : 'var(--text-muted)',
-                    cursor: 'pointer',
-                  }}
+                  className={`cockpit-segment-btn ${filter === 'hosted' ? 'active' : ''}`}
                 >
                   Hosted
                 </button>
@@ -705,17 +509,7 @@ export const DashboardPage: React.FC = () => {
                     setFilter('joined');
                     setSearchParams({ tab: 'joined' });
                   }}
-                  style={{
-                    padding: '5px 12px',
-                    borderRadius: '8px',
-                    fontSize: '0.78rem',
-                    fontFamily: 'var(--font-heading)',
-                    fontWeight: filter === 'joined' ? 700 : 500,
-                    border: 'none',
-                    background: filter === 'joined' ? 'var(--primary)' : 'transparent',
-                    color: filter === 'joined' ? '#FFFFFF' : 'var(--text-muted)',
-                    cursor: 'pointer',
-                  }}
+                  className={`cockpit-segment-btn ${filter === 'joined' ? 'active' : ''}`}
                 >
                   Joined
                 </button>
@@ -726,7 +520,7 @@ export const DashboardPage: React.FC = () => {
             <div style={{ position: 'relative' }}>
               <Search
                 size={16}
-                color="var(--text-muted)"
+                color="var(--ridex-muted)"
                 style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }}
               />
               <input
@@ -775,7 +569,7 @@ export const DashboardPage: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '14px' }}>
                 {filteredRides.map((ride) => {
                   const isHost = ride.organizerId === user?.id;
                   const isApproved = ride.participants?.some(
@@ -785,85 +579,67 @@ export const DashboardPage: React.FC = () => {
                   return (
                     <div
                       key={ride.id}
-                      className="card-glass card-interactive"
-                      style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}
+                      className={`tour-flight-strip ${ride.status === 'active' ? 'status-active' : 'status-upcoming'}`}
                       onClick={() => navigate(`/rides/${ride.id}`)}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span
-                          style={{
-                            fontSize: '0.7rem',
-                            fontFamily: 'var(--font-heading)',
-                            fontWeight: 700,
-                            padding: '3px 8px',
-                            borderRadius: '6px',
-                            background:
-                              ride.status === 'active'
-                                ? 'rgba(0, 229, 255, 0.15)'
-                                : 'rgba(255, 107, 0, 0.15)',
-                            color: ride.status === 'active' ? 'var(--cyan)' : 'var(--primary)',
-                            border: `1px solid ${
-                              ride.status === 'active' ? 'var(--border-cyan)' : 'var(--border-active)'
-                            }`,
-                            textTransform: 'uppercase',
-                          }}
-                        >
-                          {ride.status === 'active' ? 'LIVE TRACKING' : `${ride.difficulty} • ${ride.rideType}`}
+                      <div className="tour-strip-header">
+                        <span className={`tour-strip-status ${ride.status === 'active' ? 'live' : 'regular'}`}>
+                          {ride.status === 'active' ? '● LIVE TRACKING' : `${ride.difficulty} • ${ride.rideType}`}
                         </span>
 
-                        <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: 'var(--cyan)' }}>
+                        <span className="tour-strip-code">
                           {ride.joinCode}
                         </span>
                       </div>
 
                       <div>
-                        <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#FFFFFF' }}>
+                        <h4 className="tour-strip-title">
                           {ride.title}
                         </h4>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                          <MapPin size={13} color="var(--primary)" />
+                        <div className="tour-strip-route">
+                          <MapPin size={13} color="var(--ridex-orange)" />
                           <span>{ride.startLocationName}</span>
-                          <span>→</span>
+                          <span style={{ color: 'var(--ridex-muted)', margin: '0 2px' }}>→</span>
                           <span>{ride.destinationName}</span>
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.74rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-subtle)', paddingTop: '10px' }}>
+                      <div className="tour-strip-metrics">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <Calendar size={13} />
+                            <Calendar size={13} color="var(--ridex-muted)" />
                             {ride.rideDate}
                           </span>
                           <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <Clock size={13} />
+                            <Clock size={13} color="var(--ridex-muted)" />
                             {ride.departureTime}
                           </span>
                         </div>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-primary)' }}>
-                          {ride.distanceKm} km
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: '#FFFFFF', fontSize: '0.85rem' }}>
+                          {ride.distanceKm} <span style={{ fontSize: '0.68rem', color: 'var(--ridex-muted)' }}>KM</span>
                         </span>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2px' }}>
+                      <div className="tour-strip-footer">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Users size={14} color="var(--text-muted)" />
-                          <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                          <Users size={13} color="var(--ridex-muted)" />
+                          <span style={{ fontSize: '0.74rem', color: 'var(--ridex-muted)' }}>
                             {ride.participants?.length || 0} / {ride.maxRiders} riders
                           </span>
                           {isHost && (
-                            <span style={{ fontSize: '0.65rem', background: 'rgba(255, 107, 0, 0.2)', color: 'var(--primary)', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                            <span style={{ fontSize: '0.62rem', background: 'rgba(255, 107, 0, 0.18)', color: 'var(--ridex-orange)', border: '1px solid rgba(255, 107, 0, 0.35)', padding: '1px 6px', borderRadius: '4px', fontWeight: 800 }}>
                               HOST
                             </span>
                           )}
                           {isApproved && !isHost && (
-                            <span style={{ fontSize: '0.65rem', background: 'rgba(0, 230, 118, 0.2)', color: 'var(--success)', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                            <span style={{ fontSize: '0.62rem', background: 'rgba(0, 230, 118, 0.18)', color: 'var(--ridex-success)', border: '1px solid rgba(0, 230, 118, 0.35)', padding: '1px 6px', borderRadius: '4px', fontWeight: 800 }}>
                               JOINED
                             </span>
                           )}
                         </div>
 
-                        <span style={{ fontSize: '0.78rem', color: 'var(--cyan)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span>Details</span>
+                        <span style={{ fontSize: '0.78rem', color: 'var(--ridex-cyan)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px', letterSpacing: '0.03em' }}>
+                          <span>INSPECT</span>
                           <ArrowRight size={13} />
                         </span>
                       </div>

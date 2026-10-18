@@ -20,6 +20,7 @@ import {
   User,
   Settings,
   Sparkles,
+  ShieldAlert,
 } from 'lucide-react';
 import { useActiveRideStore } from '../../stores/useActiveRideStore';
 
@@ -71,35 +72,22 @@ export const Sidebar: React.FC = () => {
       badge: isTracking ? 'LIVE' : undefined,
     },
     {
-      label: 'Riders',
-      to: '/dashboard?tab=riders',
-      icon: Users,
-      isActive: location.pathname === '/dashboard' && activeTab === 'riders',
-    },
-    {
-      label: 'Routes',
-      to: '/dashboard?tab=routes',
-      icon: MapPin,
-      isActive: location.pathname === '/dashboard' && activeTab === 'routes',
-    },
-    {
-      label: 'Fuel & Expenses',
-      to: '#',
-      icon: Fuel,
-      isActive: false,
-      comingSoon: true,
+      label: 'Safety Center',
+      to: '/safety',
+      icon: ShieldAlert,
+      isActive: location.pathname.startsWith('/safety'),
     },
     {
       label: 'Community',
-      to: '/dashboard?tab=community',
+      to: '/community',
       icon: Globe,
-      isActive: location.pathname === '/dashboard' && activeTab === 'community',
+      isActive: location.pathname === '/community',
     },
     {
       label: 'Profile',
-      to: '/settings',
+      to: '/profile',
       icon: User,
-      isActive: location.pathname === '/settings',
+      isActive: location.pathname.startsWith('/profile'),
     },
     {
       label: 'Settings',

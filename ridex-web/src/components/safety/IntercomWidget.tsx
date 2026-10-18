@@ -78,7 +78,7 @@ export const IntercomWidget: React.FC<IntercomWidgetProps> = ({
   const isConnected = voiceState.state === 'CONNECTED' || voiceState.state === 'TRANSMITTING';
 
   return (
-    <div className="card-glass" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+    <div className="rx-cockpit-panel" style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

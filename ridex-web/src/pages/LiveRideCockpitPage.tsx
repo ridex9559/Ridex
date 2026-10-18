@@ -193,39 +193,46 @@ export const LiveRideCockpitPage: React.FC = () => {
     : Object.values(peerLocations);
 
   return (
-    <div className="desktop-wrapper" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      {/* Header Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div className="cockpit-screen-wrap">
+      {/* 1. Cockpit Top Aerospace Bar */}
+      <div className="cockpit-top-bar">
         <button
           onClick={() => navigate(`/rides/${id}`)}
           className="btn btn-secondary"
-          style={{ minHeight: '34px', padding: '4px 12px', fontSize: '0.8rem' }}
+          style={{ minHeight: '38px', padding: '6px 14px', fontSize: '0.82rem', borderRadius: '10px' }}
         >
-          <ArrowLeft size={14} />
-          <span>Ride Overview</span>
+          <ArrowLeft size={15} />
+          <span>Manifest</span>
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="badge badge-live">
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <span>TRANSMITTER:</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 800 }}>
+              {user?.fullName || 'Rider'}
+            </span>
+          </div>
+
+          <span className="rx-badge rx-badge-cyan">
             <Radio size={12} className="pulse-radar" />
             <span>RADAR ACTIVE</span>
           </span>
-          <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--cyan)', fontWeight: 700 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: 'var(--cyan)', fontWeight: 800 }}>
             {ride?.joinCode}
           </span>
         </div>
       </div>
 
-      {/* Geodesic Separation State Banner */}
+      {/* 2. Geodesic Separation State Banner */}
       <SeparationBanner state={separationState} />
 
-      {/* Active SOS Warning Alert */}
+      {/* 3. Active SOS Warning Alert */}
       {activeSos && (
         <div
+          className="rx-card"
           style={{
-            background: 'rgba(255, 59, 48, 0.25)',
+            background: 'rgba(255, 59, 48, 0.22)',
             border: '2px solid var(--danger)',
-            borderRadius: '12px',
             padding: '14px',
             display: 'flex',
             alignItems: 'center',
@@ -247,48 +254,31 @@ export const LiveRideCockpitPage: React.FC = () => {
           <button
             onClick={clearSos}
             className="btn btn-secondary"
-            style={{ minHeight: '30px', padding: '2px 8px', fontSize: '0.75rem' }}
+            style={{ minHeight: '34px', padding: '4px 10px', fontSize: '0.75rem' }}
           >
             Acknowledge
           </button>
         </div>
       )}
 
-      {/* GPS Error Alert */}
+      {/* 4. GPS Error Alert */}
       {gpsError && (
         <div style={{ background: 'rgba(255, 176, 32, 0.15)', border: '1px solid var(--gold)', padding: '10px 14px', borderRadius: '10px', fontSize: '0.85rem', color: 'var(--gold)' }}>
           {gpsError}
         </div>
       )}
 
-      {/* Full Map Canvas with Road-Following Route and Turn-by-Turn HUD */}
-      <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden' }}>
+      {/* 5. Full Map Canvas with Road-Following Route and Turn-by-Turn HUD */}
+      <div className="cockpit-map-viewport">
         {/* Turn-by-Turn Navigation Instruction Overlay */}
         {maneuvers.length > 0 && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '12px',
-              left: '12px',
-              right: '12px',
-              background: 'rgba(8, 10, 15, 0.94)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid var(--border-cyan)',
-              borderRadius: '12px',
-              padding: '10px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              zIndex: 500,
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
-            }}
-          >
+          <div className="cockpit-turn-hud">
             <div
               style={{
-                width: '38px',
-                height: '38px',
+                width: '40px',
+                height: '40px',
                 borderRadius: '10px',
-                background: 'rgba(0, 229, 255, 0.15)',
+                background: 'rgba(0, 240, 255, 0.15)',
                 border: '1px solid var(--border-cyan)',
                 display: 'flex',
                 alignItems: 'center',
@@ -296,23 +286,24 @@ export const LiveRideCockpitPage: React.FC = () => {
                 flexShrink: 0,
               }}
             >
-              <CornerUpRight size={20} color="var(--cyan)" />
+              <CornerUpRight size={22} color="var(--cyan)" />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{
-                  fontSize: '0.9rem',
+                  fontSize: '0.92rem',
                   fontWeight: 800,
                   color: '#FFF',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
+                  letterSpacing: '0.01em',
                 }}
               >
                 {maneuvers[0]?.instruction || 'Follow planned road route'}
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', gap: '10px' }}>
-                <span className="mono" style={{ color: 'var(--cyan)', fontWeight: 700 }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'flex', gap: '10px', marginTop: '2px' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--cyan)', fontWeight: 800 }}>
                   In {maneuvers[0]?.distanceMeters ? `${maneuvers[0].distanceMeters} m` : '500 m'}
                 </span>
                 {ride?.checkpoints && ride.checkpoints.length > 0 && (
@@ -332,46 +323,30 @@ export const LiveRideCockpitPage: React.FC = () => {
           routeCoordinates={routeCoordinates}
           riderLocations={allRiderMarkers}
           currentUserId={user?.id}
-          height="420px"
+          height="min(60vh, 520px)"
         />
 
-        {/* Floating Cockpit HUD Metrics */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '16px',
-            left: '16px',
-            right: '16px',
-            background: 'rgba(8, 10, 15, 0.92)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid var(--border-card)',
-            borderRadius: '14px',
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            zIndex: 500,
-          }}
-        >
+        {/* Floating Cockpit HUD Metrics (High-Contrast Automotive Telemetry) */}
+        <div className="cockpit-tft-cluster">
           {/* Speedometer */}
           <div>
-            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800 }}>
               SPEED
             </div>
-            <div className="mono" style={{ fontSize: '1.8rem', fontWeight: 900, lineHeight: 1, color: isTracking ? 'var(--cyan)' : 'var(--text-muted)' }}>
+            <div className="cockpit-speed-readout" style={{ color: isTracking ? 'var(--cyan)' : 'var(--text-muted)' }}>
               {isTracking ? (myLocation?.speed !== undefined ? myLocation.speed : 0) : '—'}
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginLeft: '4px' }}>
-                {isTracking ? 'km/h' : 'OFF'}
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', marginLeft: '4px' }}>
+                {isTracking ? 'KM/H' : 'OFF'}
               </span>
             </div>
           </div>
 
           {/* Heading */}
           <div>
-            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800 }}>
               HEADING
             </div>
-            <div className="mono" style={{ fontSize: '1.2rem', fontWeight: 700, lineHeight: 1, color: '#FFF' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.25rem', fontWeight: 800, lineHeight: 1, color: '#FFF' }}>
               {isTracking && myLocation?.heading !== undefined
                 ? `${Math.round(myLocation.heading)}° ${getCardinalDirection(myLocation.heading)}`
                 : '—'}
@@ -380,42 +355,39 @@ export const LiveRideCockpitPage: React.FC = () => {
 
           {/* Active Squad Radar */}
           <div>
-            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700 }}>
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800, textAlign: 'right' }}>
               SQUAD ON RADAR
             </div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>
-              {allRiderMarkers.length}
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 900, color: 'var(--primary)', textAlign: 'right' }}>
+              {allRiderMarkers.length} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>RIDERS</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tracking & Safety Actions */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '8px' }}>
+      {/* 6. Ergonomic Touch Actions (52px Touch Targets) */}
+      <div className="cockpit-action-cluster">
         <button
           onClick={handleToggleTracking}
-          className={`btn ${isTracking ? 'btn-danger' : 'btn-primary'}`}
-          style={{ padding: '12px 10px', fontSize: '0.85rem' }}
+          className={`cockpit-btn-gps ${isTracking ? 'active' : 'inactive'}`}
         >
-          {isTracking ? <Square size={16} fill="#FFF" /> : <Play size={16} fill="#FFF" />}
-          <span>{isTracking ? 'Stop GPS' : 'Start GPS'}</span>
+          {isTracking ? <Square size={18} fill="#FFF" /> : <Play size={18} fill="#07080B" />}
+          <span>{isTracking ? 'STOP GPS' : 'START GPS'}</span>
         </button>
 
         <button
           onClick={() => navigate(`/safety/${id}`)}
-          className="btn btn-secondary"
-          style={{ borderColor: 'var(--primary)', color: 'var(--primary)', fontWeight: 700, padding: '12px 8px', fontSize: '0.82rem' }}
+          className="cockpit-btn-tactical"
         >
-          <ShieldAlert size={16} />
-          <span>Safety & Voice</span>
+          <ShieldAlert size={18} color="var(--primary)" />
+          <span>SAFETY</span>
         </button>
 
         <button
           onClick={() => setShowSosModal(true)}
-          className="btn btn-secondary"
-          style={{ borderColor: 'var(--danger)', color: 'var(--danger)', fontWeight: 800, padding: '12px 8px', fontSize: '0.82rem' }}
+          className="cockpit-btn-sos"
         >
-          <AlertTriangle size={16} />
+          <AlertTriangle size={18} />
           <span>SOS</span>
         </button>
       </div>

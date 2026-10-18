@@ -141,17 +141,17 @@ export const ConnectRidePage: React.FC = () => {
   };
 
   return (
-    <div className="desktop-wrapper" style={{ maxWidth: '520px', padding: '28px 16px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="desktop-wrapper" style={{ maxWidth: '520px', padding: '24px 16px calc(84px + var(--sab))', display: 'flex', flexDirection: 'column', gap: '20px' }}>
       <button
         onClick={() => navigate('/dashboard')}
-        className="btn btn-secondary"
-        style={{ alignSelf: 'flex-start', minHeight: '34px', padding: '4px 12px', fontSize: '0.8rem' }}
+        className="rx-btn rx-btn-secondary"
+        style={{ alignSelf: 'flex-start', minHeight: '36px', padding: '4px 12px', fontSize: '0.8rem' }}
       >
         <ArrowLeft size={14} />
         <span>Back to Dashboard</span>
       </button>
 
-      <div className="card-glass" style={{ padding: '28px 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="rx-card" style={{ padding: '28px 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
           <div
             style={{

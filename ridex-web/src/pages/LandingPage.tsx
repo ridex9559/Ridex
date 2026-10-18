@@ -190,52 +190,64 @@ export const LandingPage: React.FC = () => {
           marginBottom: '8px',
         }}
       >
-        {/* Primary Action — Get Started */}
+        {/* Primary Action — Enter Live Cockpit */}
         <Link
-          to="/register"
+          to="/dashboard"
           className="btn btn-primary"
           style={{
             width: '100%',
             minHeight: '52px',
-            fontSize: '1.05rem',
-            fontWeight: 700,
-            letterSpacing: '0.02em',
+            fontSize: '1.02rem',
+            fontWeight: 800,
+            letterSpacing: '0.04em',
             borderRadius: '14px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '10px',
-            boxShadow: '0 6px 24px -2px var(--primary-glow)',
             textDecoration: 'none',
           }}
         >
-          <span>Get Started</span>
-          <ArrowRight size={20} />
+          <Radio size={18} className="pulse-radar" />
+          <span>ENTER LIVE COCKPIT</span>
+          <ArrowRight size={18} />
         </Link>
 
-        {/* Secondary Action — Existing Member Sign In */}
-        <Link
-          to="/login"
-          style={{
-            width: '100%',
-            minHeight: '44px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            color: 'var(--text-primary)',
-            background: 'rgba(26, 34, 52, 0.45)',
-            border: '1px solid var(--border-card)',
-            borderRadius: '12px',
-            fontSize: '0.9rem',
-            fontWeight: 600,
-            textDecoration: 'none',
-            transition: 'background 0.18s ease, border-color 0.18s ease',
-          }}
-        >
-          <LogIn size={16} color="var(--primary)" />
-          <span>Already a rider? Sign In</span>
-        </Link>
+        {/* Secondary Action Row: Sign In & Enlist */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', width: '100%' }}>
+          <Link
+            to="/login"
+            className="btn btn-secondary"
+            style={{
+              minHeight: '42px',
+              fontSize: '0.84rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              textDecoration: 'none',
+            }}
+          >
+            <LogIn size={14} color="var(--primary)" />
+            <span>Sign In</span>
+          </Link>
+
+          <Link
+            to="/register"
+            className="btn btn-secondary"
+            style={{
+              minHeight: '42px',
+              fontSize: '0.84rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              textDecoration: 'none',
+            }}
+          >
+            <span>Create Account</span>
+          </Link>
+        </div>
 
         {/* Quick Join Option */}
         <Link
@@ -246,7 +258,7 @@ export const LandingPage: React.FC = () => {
             textDecoration: 'none',
             letterSpacing: '0.04em',
             padding: '6px 12px',
-            minHeight: '36px',
+            minHeight: '34px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
